@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Dashboard | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+          class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a>
+      <div class="nav-label">SELF SERVICE</div>
+      <nav class="nav"><a href="user-dashboard.html" class="active"><span
+            class="nav-icon">▦</span><span>Dashboard</span></a><a href="my-tickets.html"><span
+            class="nav-icon">▤</span><span>My Tickets</span></a><a href="user-create-ticket.html"><span
+            class="nav-icon">＋</span><span>New Request</span></a><a href="user-service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="user-assets.html"><span
+            class="nav-icon">▧</span><span>My Assets</span></a><a href="role-user.html"><span
+            class="nav-icon">⚿</span><span>My Permissions</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed-in customer</strong><small data-customer-email>customer@goldenpride.local</small><a
+            href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Customer portal</div>
+          <h1>My Dashboard</h1>
+          <p class="subtitle">Self-service overview for your requests and linked assets</p>
+        </div>
+        <div class="top-actions"><span class="role-chip">customer session</span></div>
+      </header>
+      <div id="access-notice"></div>
+      <div class="role-hero">
+        <div>
+          <h2>Welcome, <span data-customer-name>Customer customer</span></h2>
+          <p>Submit requests, follow your tickets and browse services available to customers.</p>
+        </div><span class="role-chip">♙ customer · Self service</span>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-top">My open requests</div><strong>2</strong><small>Currently being handled</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Waiting for me</div><strong>1</strong><small>Support needs a reply</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Resolved</div><strong>6</strong><small>Completed requests</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Available services</div><strong>8</strong><small>Customer-visible services</small>
+        </div>
+      </div>
+      <div class="access-callout">You can create service requests, view and reply to your own tickets, browse
+        customer-visible services and view assets linked to your profile. Customer master data, projects, contracts,
+        customer administration and system settings are not available.</div>
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>My recent tickets</h2>
+              <p>Only requests associated with your customer profile</p>
+            </div><a class="btn btn-primary btn-sm" href="user-create-ticket.html">+ New request</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Subject</th>
+                  <th>Status</th>
+                  <th>Last updated</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="ticket-id" href="user-ticket-detail.html">TKT-ME-002</a></td>
+                  <td>Unable to access reporting</td>
+                  <td><span class="badge progress">In progress</span></td>
+                  <td>Oct 22, 2026</td>
+                  <td><a class="btn btn-sm" href="user-ticket-detail.html">View</a></td>
+                </tr>
+                <tr>
+                  <td><a class="ticket-id" href="user-ticket-detail.html">TKT-ME-001</a></td>
+                  <td>Request software access</td>
+                  <td><span class="badge open">Waiting for me</span></td>
+                  <td>Oct 21, 2026</td>
+                  <td><a class="btn btn-sm" href="user-ticket-detail.html">Reply</a></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-foot"><span>Personal tickets only</span><a class="btn btn-sm" href="my-tickets.html">All my
+              tickets</a></div>
+        </section>
+        <section class="card">
+          <div class="card-head">
+            <h2>Self-service</h2>
+          </div>
+          <div class="card-body item-list">
+            <div class="item">
+              <div><strong>Browse service catalog</strong><small>Find a service to request</small></div><a
+                class="btn btn-sm" href="user-service-catalog.html">Browse</a>
+            </div>
+            <div class="item">
+              <div><strong>My linked assets</strong><small>View assets assigned to you</small></div><a
+                class="btn btn-sm" href="user-assets.html">View assets</a>
+            </div>
+            <div class="item">
+              <div><strong>My permissions</strong><small>What your role can access</small></div><a class="btn btn-sm"
+                href="role-user.html">View details</a>
+            </div>
+            <div class="item"><span>Admin settings</span><span class="badge high">Restricted</span></div>
+            <div class="item"><span>Other customers' records</span><span class="badge high">Restricted</span></div>
+          </div>
+        </section>
+      </div>
+      <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

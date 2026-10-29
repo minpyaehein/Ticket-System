@@ -1,0 +1,232 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Email Notifications | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html" class="active"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Email Notifications</h1>
+          <p class="subtitle">Configure email alerts, event rules and message templates</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form> <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a>
+          <a class="btn btn-primary" href="email-notifications.html">Email settings</a>
+        </div>
+      </header>
+      <div class="notice warning"><strong>Prototype mode:</strong> This page provides the email notification settings
+        UI. Sending real emails requires a server-side mail service and credentials; they are not embedded in this
+        static website.</div>
+      <div class="tabs"><a class="active" href="email-notifications.html">Email settings</a><a href="#events">Event
+          rules</a><a href="#templates">Templates</a><a href="#delivery">Delivery log</a></div>
+      <div class="two-col">
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Mail server configuration</h2>
+                <p>Configure the outbound email connection</p>
+              </div><span class="badge open">Not connected</span>
+            </div>
+            <div class="card-body">
+              <form action="#" method="get">
+                <div class="form-grid">
+                  <div class="field "><label>SMTP host *</label><input class="input" type="text"
+                      placeholder="smtp.company.com" value=""></div>
+                  <div class="field "><label>SMTP port *</label><input class="input" type="number" placeholder="587"
+                      value=""></div>
+                  <div class="field "><label>Encryption</label><select class="select">
+                      <option>STARTTLS</option>
+                      <option>SSL / TLS</option>
+                      <option>None</option>
+                    </select></div>
+                  <div class="field "><label>Authentication</label><select class="select">
+                      <option>Username and password</option>
+                      <option>OAuth 2.0</option>
+                      <option>No authentication</option>
+                    </select></div>
+                  <div class="field "><label>SMTP username</label><input class="input" type="text"
+                      placeholder="notifications@company.com" value=""></div>
+                  <div class="field "><label>SMTP password</label><input class="input" type="password"
+                      placeholder="Enter password" value=""></div>
+                  <div class="field "><label>From name</label><input class="input" type="text"
+                      placeholder="Golden Pride Support" value=""></div>
+                  <div class="field "><label>From email *</label><input class="input" type="email"
+                      placeholder="notifications@company.com" value=""></div>
+                  <div class="field "><label>Reply-to email</label><input class="input" type="email"
+                      placeholder="support@company.com" value=""></div>
+                  <div class="field "><label>Connection timeout (seconds)</label><input class="input" type="number"
+                      placeholder="15" value=""></div>
+                </div>
+                <div class="form-actions"><button class="btn" type="reset">Reset fields</button><button
+                    class="btn btn-primary" type="submit">Save mail settings</button></div>
+              </form>
+            </div>
+          </section>
+          <section class="card" id="events">
+            <div class="card-head">
+              <div>
+                <h2>Notification event rules</h2>
+                <p>Choose which events should send an email</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="toggle-row">
+                <div><strong>Ticket created</strong>
+                  <p>Notify the support team when a new ticket is submitted</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="Ticket created">
+              </div>
+              <div class="toggle-row">
+                <div><strong>Ticket assigned</strong>
+                  <p>Email the new assignee when ownership changes</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="Ticket assigned">
+              </div>
+              <div class="toggle-row">
+                <div><strong>Status changed</strong>
+                  <p>Notify requester and assigned team about status updates</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="Status changed">
+              </div>
+              <div class="toggle-row">
+                <div><strong>New comment or reply</strong>
+                  <p>Send an email when a ticket receives a response</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="New comment or reply">
+              </div>
+              <div class="toggle-row">
+                <div><strong>SLA approaching</strong>
+                  <p>Alert team members before a response target is missed</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="SLA approaching">
+              </div>
+              <div class="toggle-row">
+                <div><strong>Ticket resolved</strong>
+                  <p>Send resolution notice to the requester</p>
+                </div><input class="toggle" type="checkbox" checked aria-label="Ticket resolved">
+              </div>
+              <div class="toggle-row">
+                <div><strong>Daily summary</strong>
+                  <p>Send a daily digest of open and overdue tickets</p>
+                </div><input class="toggle" type="checkbox" aria-label="Daily summary">
+              </div>
+              <div class="form-actions"><button class="btn btn-primary" type="submit">Save event rules</button></div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Send test email</h2>
+                <p>Verify the mail server connection</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <form action="#" method="get">
+                <div class="field "><label>Recipient email</label><input class="input" type="email"
+                    placeholder="you@company.com" value=""></div>
+                <div style="margin-top:14px"><button class="btn btn-primary" type="submit">✉ Send test email</button>
+                </div>
+              </form>
+              <p class="subtitle" style="margin-top:12px">A successful test requires a configured backend mailer.</p>
+            </div>
+          </section>
+          <section class="card" id="templates">
+            <div class="card-head">
+              <div>
+                <h2>Email templates</h2>
+                <p>Manage the content used by notifications</p>
+              </div><a class="btn btn-sm" href="#templates">Edit templates</a>
+            </div>
+            <div class="card-body item-list">
+              <div class="item">
+                <div><strong>Ticket created</strong><small>Subject: Ticket {ticket_id} has been created</small></div><a
+                  class="btn btn-sm" href="#templates">Edit</a>
+              </div>
+              <div class="item">
+                <div><strong>Ticket assigned</strong><small>Subject: Ticket {ticket_id} assigned to you</small></div><a
+                  class="btn btn-sm" href="#templates">Edit</a>
+              </div>
+              <div class="item">
+                <div><strong>Ticket resolved</strong><small>Subject: Your request has been resolved</small></div><a
+                  class="btn btn-sm" href="#templates">Edit</a>
+              </div>
+            </div>
+          </section>
+          <section class="card" id="delivery">
+            <div class="card-head">
+              <div>
+                <h2>Recent delivery activity</h2>
+                <p>Example notification log</p>
+              </div><a class="btn btn-sm" href="audit-log.html">View audit log</a>
+            </div>
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Event</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>thura@nova.example</td>
+                    <td>Ticket resolved</td>
+                    <td><span class="badge closed">Sent</span></td>
+                  </tr>
+                  <tr>
+                    <td>aye.aye@goldenpride.local</td>
+                    <td>Ticket assigned</td>
+                    <td><span class="badge closed">Sent</span></td>
+                  </tr>
+                  <tr>
+                    <td>support@company.com</td>
+                    <td>Daily summary</td>
+                    <td><span class="badge high">Not configured</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

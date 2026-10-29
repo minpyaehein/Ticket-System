@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Roles &amp; Access | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html" class="active"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Roles &amp; Access</h1>
+          <p class="subtitle">Choose a role to view its dashboard and permitted actions</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form> <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a><a class="btn" href="users.html">Manage users</a>
+        </div>
+      </header>
+
+      <section class="role-grid">
+        <article class="role-card">
+          <div class="role-card-head">
+            <div class="role-bubble">A</div>
+            <div>
+              <h2>Admin</h2>
+              <p>Full workspace administrator</p>
+            </div>
+          </div><span class="badge progress">Full access</span>
+          <ul>
+            <li>Manage all tickets and records</li>
+            <li>Create users, teams and roles</li>
+            <li>Configure email notifications and SLA settings</li>
+            <li>Review audit logs and workspace settings</li>
+          </ul><a class="btn btn-primary" href="role-admin.html">View details →</a>
+        </article>
+        <article class="role-card">
+          <div class="role-card-head">
+            <div class="role-bubble agent">AG</div>
+            <div>
+              <h2>Agent</h2>
+              <p>Service desk / support team</p>
+            </div>
+          </div><span class="badge open">Operational access</span>
+          <ul>
+            <li>Create and update tickets</li>
+            <li>Work on assigned team tickets</li>
+            <li>View customers, projects, contracts and assets</li>
+            <li>Add ticket comments and update resolution</li>
+          </ul><a class="btn btn-primary" href="role-agent.html">View details →</a>
+        </article>
+        <article class="role-card">
+          <div class="role-card-head">
+            <div class="role-bubble customer">C</div>
+            <div>
+              <h2>customer</h2>
+              <p>Customer / requester</p>
+            </div>
+          </div><span class="badge closed">Self-service access</span>
+          <ul>
+            <li>Create service requests</li>
+            <li>View own tickets and status</li>
+            <li>Reply to support requests</li>
+            <li>Browse customer-visible service catalog</li>
+          </ul><a class="btn btn-primary" href="role-user.html">View details →</a>
+        </article>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Role permission dashboard</h2>
+            <p>Compare what each role can do across core modules</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Module / Action</th>
+                <th>Admin</th>
+                <th>Agent</th>
+                <th>customer</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Dashboard</td>
+                <td class="permission-yes">Full analytics</td>
+                <td class="permission-limited">Team workload</td>
+                <td class="permission-limited">Own requests</td>
+              </tr>
+              <tr>
+                <td>Tickets</td>
+                <td class="permission-yes">Create / View / Edit / Delete</td>
+                <td class="permission-limited">Create / View team / Edit assigned</td>
+                <td class="permission-limited">Create / View own / Reply</td>
+              </tr>
+              <tr>
+                <td>Customers & Contacts</td>
+                <td class="permission-yes">Full access</td>
+                <td class="permission-limited">View</td>
+                <td class="permission-no">No access</td>
+              </tr>
+              <tr>
+                <td>Projects & Contracts</td>
+                <td class="permission-yes">Full access</td>
+                <td class="permission-limited">View linked records</td>
+                <td class="permission-no">No access</td>
+              </tr>
+              <tr>
+                <td>Service Catalog</td>
+                <td class="permission-yes">Manage all</td>
+                <td class="permission-limited">View</td>
+                <td class="permission-limited">View customer-visible</td>
+              </tr>
+              <tr>
+                <td>Assets</td>
+                <td class="permission-yes">Full access</td>
+                <td class="permission-limited">View / link to tickets</td>
+                <td class="permission-limited">View own linked assets</td>
+              </tr>
+              <tr>
+                <td>Users, Teams & Roles</td>
+                <td class="permission-yes">Full access</td>
+                <td class="permission-no">No access</td>
+                <td class="permission-no">No access</td>
+              </tr>
+              <tr>
+                <td>Email notification settings</td>
+                <td class="permission-yes">Configure</td>
+                <td class="permission-limited">Receive alerts</td>
+                <td class="permission-limited">Receive own ticket emails</td>
+              </tr>
+              <tr>
+                <td>Audit Log & System Settings</td>
+                <td class="permission-yes">View / manage</td>
+                <td class="permission-no">No access</td>
+                <td class="permission-no">No access</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="card-body">
+          <div class="notice">Admin, Agent, and Customer access is enforced by the Python backend. Custom role definitions are saved for configuration, but do not create a new login role automatically.</div>
+        </div>
+      </section>
+
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

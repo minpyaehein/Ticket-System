@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Asset details | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html" class="active"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Asset details</h1>
+          <p class="subtitle">View ownership, lifecycle and linked service tickets</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form> <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a>
+        </div>
+      </header>
+      <div class="breadcrumb"><a href="assets.html">Assets</a> / DB-SRV-014</div>
+      <div class="inline" style="justify-content:space-between;margin-bottom:16px"><span class="badge closed">In
+          service</span><a class="btn btn-primary" href="add-asset.html">Edit asset</a></div>
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Asset information</h2>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="item-list">
+              <div class="item"><span>Asset tag</span><strong>DB-SRV-014</strong></div>
+              <div class="item"><span>Name</span><strong>Production Database Server</strong></div>
+              <div class="item"><span>Customer</span><strong>Nova Manufacturing</strong></div>
+              <div class="item"><span>Category</span><strong>Server</strong></div>
+              <div class="item"><span>Serial number</span><strong>SN-DB-14882</strong></div>
+              <div class="item"><span>Location</span><strong>Server Room A</strong></div>
+              <div class="item"><span>Warranty end</span><strong>Dec 31, 2027</strong></div>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Linked tickets</h2>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Ticket</th>
+                    <th>Subject</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-007</a></td>
+                    <td>Database connection timeout</td>
+                    <td><span class="badge closed">Closed</span></td>
+                  </tr>
+                  <tr>
+                    <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-004</a></td>
+                    <td>VPN connectivity issue</td>
+                    <td><span class="badge progress">In progress</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+      </div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Lifecycle history</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="item-list">
+            <div class="item">
+              <div><strong>Asset registered</strong><small>Jan 12, 2026 · System Administrator</small></div><span
+                class="badge closed">Created</span>
+            </div>
+            <div class="item">
+              <div><strong>Preventive check completed</strong><small>Sep 20, 2026 · Infrastructure Team</small></div>
+              <span class="badge closed">Completed</span>
+            </div>
+          </div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

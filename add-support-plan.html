@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Add support plan | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html" class="active"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+
+        <a href="users.html"><span class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Add support plan</h1>
+          <p class="subtitle">Define coverage, service targets and availability</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form> <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a>
+        </div>
+      </header>
+      <div class="breadcrumb"><a href="support-plans.html">Support Plans</a> / Add plan</div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Plan settings</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="#" method="get">
+            <div class="form-grid">
+              <div class="field "><label>Plan code *</label><input class="input" type="text"
+                  placeholder="e.g. SLA-STD-01" value=""></div>
+              <div class="field "><label>Plan name *</label><input class="input" type="text"
+                  placeholder="Standard Support Plan" value=""></div>
+              <div class="field "><label>Response SLA</label><input class="input" type="text" placeholder="e.g. 4 hours"
+                  value=""></div>
+              <div class="field "><label>Resolution SLA</label><input class="input" type="text"
+                  placeholder="e.g. 1 business day" value=""></div>
+              <div class="field "><label>Response Warning %</label><input class="input" type="number"
+                  placeholder="e.g. 70" value=""></div>
+              <div class="field "><label>Response Critical %</label><input class="input" type="number"
+                  placeholder="e.g. 90" value=""></div>
+              <div class="field "><label>Resolution Warning %</label><input class="input" type="number"
+                  placeholder="e.g. 70" value=""></div>
+              <div class="field "><label>Resolution Critical %</label><input class="input" type="number"
+                  placeholder="e.g. 90" value=""></div>
+              <div class="field "><label>SLA Calendar Mode</label><select class="select">
+                  <option>Business hours</option>
+                  <option>24×7 calendar</option>
+                  <option>Custom calendar</option>
+                </select></div>
+              <div class="field "><label>Time Zone</label><select class="select">
+                  <option>Asia/Yangon</option>
+                  <option>Asia/Bangkok</option>
+                  <option>UTC</option>
+                  <option>Asia/Singapore</option>
+                </select></div>
+              <div class="field "><label>Business Start</label><input class="input" type="time" value="09:00"></div>
+              <div class="field "><label>Business End</label><input class="input" type="time" value="17:30"></div>
+              <div class="field full "><label>Working Days</label>
+                <div class="check-grid" id="target-grid"><label class="check-option"><input type="checkbox" checked>
+                    <span>Monday</span></label><label class="check-option"><input type="checkbox" checked>
+                    <span>Tuesday</span></label><label class="check-option"><input type="checkbox" checked>
+                    <span>Wednesday</span></label><label class="check-option"><input type="checkbox" checked>
+                    <span>Thursday</span></label><label class="check-option"><input type="checkbox" checked>
+                    <span>Friday</span></label><label class="check-option"><input type="checkbox">
+                    <span>Saturday</span></label><label class="check-option"><input type="checkbox">
+                    <span>Sunday</span></label></div>
+              </div>
+              <div class="field "><label>Escalation Level</label><select class="select">
+                  <option>Level 1</option>
+                  <option>Level 2</option>
+                  <option>Level 3</option>
+                  <option>Level 4</option>
+                </select></div>
+              <div class="field "><label>Remote Support</label><select class="select">
+                  <option>Included</option>
+                  <option>Excluded</option>
+                </select></div>
+              <div class="field "><label>Onsite Support</label><select class="select">
+                  <option>Included</option>
+                  <option>Excluded</option>
+                </select></div>
+              <div class="field full"><label>Description</label><textarea class="textarea"
+                  placeholder="Describe plan coverage and SLA rules"></textarea></div>
+            </div>
+            <div class="form-actions"><a class="btn" href="support-plans.html">Cancel</a><button class="btn btn-primary"
+                type="submit">Create support plan</button></div>
+          </form>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

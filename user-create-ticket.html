@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>New Service Request | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+          class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a>
+      <div class="nav-label">SELF SERVICE</div>
+      <nav class="nav"><a href="user-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="my-tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a><a
+          href="user-create-ticket.html" class="active"><span class="nav-icon">＋</span><span>New Request</span></a><a
+          href="user-service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a><a
+          href="user-assets.html"><span class="nav-icon">▧</span><span>My Assets</span></a><a
+          href="role-user.html"><span class="nav-icon">⚿</span><span>My Permissions</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed-in customer</strong><small data-customer-email>customer@goldenpride.local</small><a
+            href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Customer portal</div>
+          <h1>New Service Request</h1>
+          <p class="subtitle">Create a new request visible to the service desk</p>
+        </div>
+        <div class="top-actions"></div>
+      </header>
+      <div id="access-notice"></div>
+      <div class="notice">This form is for the signed-in requester. Customer identity is taken from the login profile
+        and cannot be changed here.</div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Request information</h2>
+            <p>Submit a customer-visible service request</p>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="my-tickets.html" method="get">
+            <div class="form-grid">
+              <div class="field"><label>Requester</label><input class="input" value="Signed-in customer" readonly
+                  data-customer-name></div>
+              <div class="field"><label>Requester email</label><input class="input" value="customer@goldenpride.local"
+                  readonly data-customer-email></div>
+              <div class="field"><label>Service *</label><select class="select" required>
+                  <option value="">Select service</option>
+                  <option>Application access</option>
+                  <option>Software request</option>
+                  <option>Network access</option>
+                  <option>Hardware support</option>
+                </select></div>
+              <div class="field"><label>Request type *</label><select class="select" required>
+                  <option value="">Select request type</option>
+                  <option>Incident</option>
+                  <option>Service request</option>
+                  <option>Access request</option>
+                </select></div>
+              <div class="field full"><label>Subject *</label><input class="input" required
+                  placeholder="Briefly describe what you need"></div>
+              <div class="field full"><label>Description</label><textarea class="textarea"
+                  placeholder="Add details to help the support team understand your request"></textarea></div>
+              <div class="field"><label>Related asset (optional)</label><select class="select">
+                  <option>None</option>
+                  <option>MY-LAPTOP-01</option>
+                </select></div>
+              <div class="field"><label>Attachment reference (optional)</label><input class="input"
+                  placeholder="File name / reference"></div>
+            </div>
+            <div class="form-actions"><a class="btn" href="my-tickets.html">Cancel</a><button class="btn btn-primary"
+                type="submit">Submit request</button></div>
+          </form>
+          <p class="subtitle">Static prototype: submitting returns to My Tickets but does not save or send the request.
+          </p>
+        </div>
+      </section>
+      <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

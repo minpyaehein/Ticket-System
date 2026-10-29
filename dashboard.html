@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Dashboard | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html" class="active"><span
+            class="nav-icon">▦</span><span>Dashboard</span></a><a href="tickets.html"><span
+            class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+
+        <a href="users.html"><span class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Dashboard</h1>
+          <p class="subtitle">Your service desk at a glance</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form>
+
+          <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a><a class="btn btn-primary" href="add-ticket.html">+ New Ticket</a>
+        </div>
+      </header>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-top">Open tickets<span class="stat-icon">◷</span></div><strong>24</strong><small class="">↗
+            8% vs last week</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">In progress<span class="stat-icon">◉</span></div><strong>12</strong><small
+            class="">Across 4 support teams</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Resolved this month<span class="stat-icon">✓</span></div><strong>186</strong><small
+            class="up">↗ 12% vs last month</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">SLA at risk<span class="stat-icon">!</span></div><strong>3</strong><small class="">Needs
+            attention today</small>
+        </div>
+      </div>
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Recent tickets</h2>
+              <p>Latest customer requests across your workspace</p>
+            </div><a class="btn btn-sm" href="tickets.html">View all →</a>
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Ticket</th>
+                  <th>Customer / Project</th>
+                  <th>Contract</th>
+                  <th>Request type</th>
+                  <th>Subject</th>
+                  <th>Status</th>
+                  <th>Priority</th>
+                  <th>Assigned to</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-007</a></td>
+                  <td>Nova Manufacturing<span class="sub-cell">General Support Project</span></td>
+                  <td>AUTO-2-SUPPORT</td>
+                  <td>Database Support</td>
+                  <td>Database connection timeout</td>
+                  <td><span class="badge open">Open</span></td>
+                  <td><span class="badge high">High</span></td>
+                  <td>Support Engineer</td>
+                  <td>Oct 22, 2026</td>
+                </tr>
+                <tr>
+                  <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-006</a></td>
+                  <td>Summit Trading<span class="sub-cell">ERP Modernization</span></td>
+                  <td>ERP-CARE</td>
+                  <td>Application Support</td>
+                  <td>customer access request</td>
+                  <td><span class="badge progress">In progress</span></td>
+                  <td><span class="badge medium">Medium</span></td>
+                  <td>Aye Aye</td>
+                  <td>Oct 22, 2026</td>
+                </tr>
+                <tr>
+                  <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-005</a></td>
+                  <td>Orchid Healthcare<span class="sub-cell">Infrastructure</span></td>
+                  <td>INFRA-STD</td>
+                  <td>Hardware</td>
+                  <td>Workstation setup</td>
+                  <td><span class="badge closed">Resolved</span></td>
+                  <td><span class="badge low">Low</span></td>
+                  <td>Ko Min</td>
+                  <td>Oct 21, 2026</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="table-foot"><span>Showing 3 recent tickets</span><a class="btn btn-primary btn-sm"
+              href="add-ticket.html">+ New ticket</a></div>
+        </section>
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Quick actions</h2>
+                <p>Common service desk tasks</p>
+              </div>
+            </div>
+            <div class="card-body item-list">
+              <div class="item">
+                <div><strong>Create a ticket</strong><small>Log a customer request</small></div><a class="btn btn-sm"
+                  href="add-ticket.html">Create →</a>
+              </div>
+              <div class="item">
+                <div><strong>Add a customer</strong><small>Register a customer account</small></div><a
+                  class="btn btn-sm" href="add-customer.html">Add →</a>
+              </div>
+              <div class="item">
+                <div><strong>Email notifications</strong><small>Configure alerts and templates</small></div><a
+                  class="btn btn-sm" href="email-notifications.html">Configure →</a>
+              </div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-head">
+              <h2>Ticket status</h2>
+            </div>
+            <div class="card-body item-list">
+              <div class="item"><span>Open</span><strong>24</strong></div>
+              <div class="item"><span>In progress</span><strong>12</strong></div>
+              <div class="item"><span>Pending customer</span><strong>8</strong></div>
+              <div class="item"><span>Resolved</span><strong>186</strong></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

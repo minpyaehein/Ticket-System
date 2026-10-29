@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Service Catalog | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html" class="active"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar">SA</div>
+        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Service Catalog</h1>
+          <p class="subtitle">Publish request types and standard service offerings</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form> <a class="btn compact-alert" href="email-notifications.html">
+            ♧ Alerts <span class="badge open">3</span>
+          </a><a class="btn btn-primary" href="add-request-type.html">+ Add request type</a>
+        </div>
+      </header>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Service Catalog register</h2>
+            <p>Manage records and view related details</p>
+          </div>
+          <div class="inline"><a class="btn btn-sm" href="#">Export</a><a class="btn btn-primary btn-sm"
+              href="add-request-type.html">+ Add request type</a></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>CODE</th>
+                <th>NAME</th>
+                <th>CATEGORY</th>
+                <th>SORT ORDER</th>
+                <th>CUSTOMER VISIBLE</th>
+                <th>ASSET REQUIREMENTS</th>
+                <th>MAPPED TEAM</th>
+                <th>AUTO ASSIGN</th>
+                <th>ASSIGENMENT METHOD</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>CODE-900</td>
+                <td>NOVA</td>
+                <td>GENERAL</td>
+                <td>100</td>
+                <td><span class="badge high">YES</span></td>
+                <td><span class="badge high">NOT REQUIRED</span></td>
+                <td>DATABASE TEAM</td>
+                <td><span class="badge closed">ENABLED</span></td>
+                <td>DEFAULT ENGINEER</td>
+                <td><a class="btn btn-sm" href="add-request-type.html">Edit</a></td>
+              </tr>
+              <tr>
+                <td>CODE-900</td>
+                <td>NOVA</td>
+                <td>GENERAL</td>
+                <td>100</td>
+                <td><span class="badge high">YES</span></td>
+                <td><span class="badge high">NOT REQUIRED</span></td>
+                <td>DATABASE TEAM</td>
+                <td><span class="badge closed">ENABLED</span></td>
+                <td>DEFAULT ENGINEER</td>
+                <td><a class="btn btn-sm" href="add-request-type.html">Edit</a></td>
+              </tr>
+              <tr>
+                <td>CODE-900</td>
+                <td>NOVA</td>
+                <td>GENERAL</td>
+                <td>100</td>
+                <td><span class="badge high">YES</span></td>
+                <td><span class="badge high">NOT REQUIRED</span></td>
+                <td>DATABASE TEAM</td>
+                <td><span class="badge closed">ENABLED</span></td>
+                <td>DEFAULT ENGINEER</td>
+                <td><a class="btn btn-sm" href="add-request-type.html">Edit</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span>Showing 3 sample records</span>
+          <div class="pagination"><a class="current" href="service-catalog.html">1</a><a
+              href="service-catalog.html">2</a><a href="service-catalog.html">Next →</a></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

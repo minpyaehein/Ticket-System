@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Ticket Details | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+          class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a>
+      <div class="nav-label">SELF SERVICE</div>
+      <nav class="nav"><a href="user-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="my-tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a><a
+          href="user-create-ticket.html"><span class="nav-icon">＋</span><span>New Request</span></a><a
+          href="user-service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a><a
+          href="user-assets.html"><span class="nav-icon">▧</span><span>My Assets</span></a><a
+          href="role-user.html"><span class="nav-icon">⚿</span><span>My Permissions</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed-in customer</strong><small data-customer-email>customer@goldenpride.local</small><a
+            href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Customer portal</div>
+          <h1>My Ticket Details</h1>
+          <p class="subtitle">Review your request and reply to the support team</p>
+        </div>
+        <div class="top-actions"></div>
+      </header>
+      <div id="access-notice"></div>
+      <div class="inline" style="justify-content:space-between;margin-bottom:16px">
+        <div class="inline"><span class="code">TKT-ME-002</span><span class="badge progress">In progress</span></div><a
+          class="btn" href="my-tickets.html">← My tickets</a>
+      </div>
+      <div class="two-col">
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Unable to access reporting</h2>
+                <p>Created Oct 22, 2026 · Application access</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <p>You reported that the reporting page is not opening after sign-in.</p>
+              <div class="notice">Internal notes, staff-only information and other customers' records are not shown in
+                this view.</div>
+              <h3 style="font-size:12px">Conversation</h3>
+              <div class="item-list">
+                <div class="item">
+                  <div><strong>Support Agent</strong><small>Oct 22, 2026 · 10:45 AM</small>
+                    <p>Please confirm whether this happens in another browser as well.</p>
+                  </div>
+                </div>
+                <div class="item">
+                  <div><strong>You</strong><small>Oct 22, 2026 · 9:30 AM</small>
+                    <p>The reporting page stays blank when I open it.</p>
+                  </div>
+                </div>
+              </div>
+              <form action="my-tickets.html" method="get" style="margin-top:18px">
+                <div class="field"><label>Your reply</label><textarea class="textarea"
+                    placeholder="Write a reply to the support team"></textarea></div>
+                <div class="form-actions"><button class="btn btn-primary" type="submit">Send reply</button></div>
+              </form>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <h2>Request summary</h2>
+            </div>
+            <div class="card-body item-list">
+              <div class="item"><span>Requester</span><strong data-customer-name>Customer customer</strong></div>
+              <div class="item"><span>Request type</span><strong>Application access</strong></div>
+              <div class="item"><span>Assigned team</span><strong>Service Desk</strong></div>
+              <div class="item"><span>Next step</span><strong>Reply requested</strong></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>
