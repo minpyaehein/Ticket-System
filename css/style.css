@@ -1290,3 +1290,41 @@ select[multiple].select {
 @media(max-width:900px){.login-shell{grid-template-columns:1fr}.login-brand-panel{padding:28px;gap:28px}.login-brand-panel h1{font-size:34px}.login-form-side{padding:20px}.login-feature-grid{grid-template-columns:1fr 1fr}.permission-grid{grid-template-columns:1fr}}
 
 .logout-link{display:block;font-size:10px;color:#aab6cf;margin-top:5px}.logout-link:hover{color:#fff}
+
+/* Consistent account footer across authenticated pages */
+.sidebar-bottom .logout-link{display:block;margin-top:7px;font-size:11px;color:#aab9d4;text-decoration:none}.sidebar-bottom .logout-link:hover{color:#fff;text-decoration:underline}.sidebar-bottom{flex-shrink:0}
+
+
+/* Email setup helpers and staff-only notes */
+.field-help { display:block; margin-top:6px; color:var(--muted); font-size:11px; line-height:1.5; }
+.advanced-mail-settings { margin-top:18px; padding:14px; border:1px solid var(--line); border-radius:10px; background:#fafbfe; }
+.advanced-mail-settings summary { cursor:pointer; color:var(--ink); font-size:12px; font-weight:700; }
+.advanced-mail-settings > .subtitle { margin:10px 0 14px; }
+.internal-note-rule { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 12px; margin:6px 0 12px; border:1px solid #f1d6a5; border-radius:10px; background:#fffbf1; }
+.internal-note-rule strong { font-size:12px; }
+.internal-note-rule p { color:var(--muted); font-size:11px; line-height:1.5; margin:5px 0 0; max-width:650px; }
+.staff-reply-controls { display:flex; align-items:center; flex-wrap:wrap; gap:12px; margin-top:10px; }
+.staff-reply-controls .subtitle { margin:0; }
+.staff-reply-form.is-internal-note { padding:12px; border:1px solid #e8bd64; border-radius:10px; background:#fffaf0; }
+.gp-confirm-dialog { width:min(460px,calc(100vw - 32px)); max-width:none; padding:0; border:0; border-radius:16px; box-shadow:0 24px 80px #101a2d40; color:var(--ink); }
+.gp-confirm-dialog::backdrop { background:rgb(16 26 45 / 48%); backdrop-filter:blur(2px); }
+.gp-confirm-content { padding:26px; }
+.gp-confirm-icon { width:42px; height:42px; display:grid; place-items:center; border-radius:50%; background:#fff1d5; color:#9a6500; font-size:22px; font-weight:800; margin-bottom:14px; }
+.gp-confirm-content h2 { font-size:18px; margin:0 0 9px; }
+.gp-confirm-content p { color:var(--muted); font-size:13px; line-height:1.6; margin:0; }
+.gp-confirm-actions { display:flex; justify-content:flex-end; gap:10px; margin-top:24px; }
+.gp-confirm-dialog[open] { animation:gp-confirm-in .12s ease-out; }
+@keyframes gp-confirm-in { from { transform:translateY(5px); opacity:.85; } to { transform:translateY(0); opacity:1; } }
+@media (max-width:600px) { .internal-note-rule { align-items:flex-start; flex-direction:column; } .gp-confirm-content { padding:20px; } }
+
+/* Ticket composer: clear public-reply/internal-note selector */
+.reply-mode-wrap{margin-top:10px;padding:11px 12px;border:1px solid var(--line);border-radius:10px;background:#fafbfe}
+.reply-mode-caption{display:block;margin-bottom:7px;color:var(--muted);font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.07em}
+.reply-mode-switch{display:inline-flex;gap:4px;max-width:100%;padding:4px;background:#eef1f6;border-radius:9px}
+.reply-mode-option{appearance:none;border:1px solid transparent;border-radius:7px;padding:8px 12px;background:transparent;color:var(--muted);font:inherit;font-size:12px;font-weight:700;cursor:pointer;transition:background .15s,border-color .15s,color .15s}
+.reply-mode-option:hover{color:var(--ink)}
+.reply-mode-option.is-selected{background:#fff;border-color:#dfe4ee;color:var(--ink);box-shadow:0 1px 3px #15213b12}
+.reply-mode-option[data-reply-mode="internal"].is-selected{background:#fff7e6;border-color:#e8c77e;color:#805600}
+.reply-mode-hint{margin:8px 0 0;color:var(--muted);font-size:11px;line-height:1.45}
+.staff-reply-form.is-internal-note{padding:12px;border:1px solid #e8bd64;border-radius:10px;background:#fffaf0}
+@media(max-width:520px){.reply-mode-switch{display:flex;width:100%}.reply-mode-option{flex:1;padding:9px 7px}}

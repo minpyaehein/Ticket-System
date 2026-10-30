@@ -162,18 +162,32 @@ CREATE TABLE IF NOT EXISTS users (
 	team_id INTEGER, 
 	notes TEXT, 
 	active BOOLEAN NOT NULL, 
+	must_change_password BOOLEAN NOT NULL DEFAULT FALSE, 
 	created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
 	PRIMARY KEY (user_id), 
 	FOREIGN KEY(team_id) REFERENCES teams (team_id) ON DELETE SET NULL
+);
+
+CREATE TABLE IF NOT EXISTS user_notification_preferences (
+	user_id INTEGER NOT NULL,
+	settings_json TEXT NOT NULL,
+	updated_at TIMESTAMP WITHOUT TIME ZONE NOT NULL,
+	PRIMARY KEY (user_id),
+	FOREIGN KEY(user_id) REFERENCES users (user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE IF NOT EXISTS audit_logs (
 	audit_id SERIAL NOT NULL, 
 	user_id INTEGER, 
 	user_name VARCHAR(160), 
+	actor_role VARCHAR(40), 
 	action VARCHAR(100) NOT NULL, 
 	module VARCHAR(80) NOT NULL, 
+	entity_id VARCHAR(120), 
+	entity_label VARCHAR(240), 
+	ip_address VARCHAR(64), 
 	details TEXT, 
+	change_data TEXT, 
 	created_at TIMESTAMP WITHOUT TIME ZONE NOT NULL, 
 	PRIMARY KEY (audit_id), 
 	FOREIGN KEY(user_id) REFERENCES users (user_id) ON DELETE SET NULL

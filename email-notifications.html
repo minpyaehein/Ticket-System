@@ -23,16 +23,16 @@
             class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
             class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
             class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
-            class="nav-icon">♟</span><span>customer Management</span></a><a href="teams.html"><span
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
             class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
             class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
             class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html" class="active"><span
             class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
       <div class="sidebar-bottom">
-        <div class="avatar">SA</div>
-        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
       </div>
-    </aside>
+</aside>
     <main class="main">
       <header class="topbar">
         <div>
@@ -50,9 +50,7 @@
           <a class="btn btn-primary" href="email-notifications.html">Email settings</a>
         </div>
       </header>
-      <div class="notice warning"><strong>Prototype mode:</strong> This page provides the email notification settings
-        UI. Sending real emails requires a server-side mail service and credentials; they are not embedded in this
-        static website.</div>
+      <div class="notice warning"><strong>First-time setup:</strong> Choose your email provider, enter your email address and app password, save the settings, then send a test email. Internal notes are staff-only and never emailed to customers.</div>
       <div class="tabs"><a class="active" href="email-notifications.html">Email settings</a><a href="#events">Event
           rules</a><a href="#templates">Templates</a><a href="#delivery">Delivery log</a></div>
       <div class="two-col">
@@ -65,37 +63,46 @@
               </div><span class="badge open">Not connected</span>
             </div>
             <div class="card-body">
-              <form action="#" method="get">
+              <form id="email-server-settings-form" action="#" method="post">
                 <div class="form-grid">
-                  <div class="field "><label>SMTP host *</label><input class="input" type="text"
-                      placeholder="smtp.company.com" value=""></div>
-                  <div class="field "><label>SMTP port *</label><input class="input" type="number" placeholder="587"
-                      value=""></div>
-                  <div class="field "><label>Encryption</label><select class="select">
-                      <option>STARTTLS</option>
-                      <option>SSL / TLS</option>
-                      <option>None</option>
-                    </select></div>
-                  <div class="field "><label>Authentication</label><select class="select">
-                      <option>Username and password</option>
-                      <option>OAuth 2.0</option>
-                      <option>No authentication</option>
-                    </select></div>
-                  <div class="field "><label>SMTP username</label><input class="input" type="text"
-                      placeholder="notifications@company.com" value=""></div>
-                  <div class="field "><label>SMTP password</label><input class="input" type="password"
-                      placeholder="Enter password" value=""></div>
-                  <div class="field "><label>From name</label><input class="input" type="text"
-                      placeholder="Golden Pride Support" value=""></div>
-                  <div class="field "><label>From email *</label><input class="input" type="email"
-                      placeholder="notifications@company.com" value=""></div>
-                  <div class="field "><label>Reply-to email</label><input class="input" type="email"
-                      placeholder="support@company.com" value=""></div>
-                  <div class="field "><label>Connection timeout (seconds)</label><input class="input" type="number"
-                      placeholder="15" value=""></div>
+                  <div class="field">
+                    <label>Email provider *</label>
+                    <select class="select" id="smtp-provider">
+                      <option value="gmail">Gmail</option>
+                      <option value="outlook">Outlook / Microsoft 365</option>
+                      <option value="custom">Other email provider</option>
+                    </select>
+                    <small class="field-help">Choose the email service you use. Gmail users need a Google App Password.</small>
+                  </div>
+                  <div class="field">
+                    <label>Email account address *</label>
+                    <input class="input" id="smtp-email-address" type="email" autocomplete="email" placeholder="you@gmail.com" required>
+                  </div>
+                  <div class="field">
+                    <label>App password</label>
+                    <input class="input" id="smtp-app-password" type="password" autocomplete="new-password" placeholder="Paste your Google App Password">
+                    <small class="field-help">Do not use your normal Gmail password. Leave blank to keep the saved password.</small>
+                  </div>
+                  <div class="field">
+                    <label>Sender display name</label>
+                    <input class="input" id="smtp-from-name" type="text" placeholder="Golden Pride Support" value="Golden Pride Support">
+                  </div>
                 </div>
-                <div class="form-actions"><button class="btn" type="reset">Reset fields</button><button
-                    class="btn btn-primary" type="submit">Save mail settings</button></div>
+                <details class="advanced-mail-settings">
+                  <summary>Advanced SMTP settings (optional)</summary>
+                  <p class="subtitle">Gmail and Outlook settings fill automatically when selected above. Change these only if your provider gave you different details.</p>
+                  <div class="form-grid">
+                    <div class="field"><label>SMTP host</label><input class="input" id="smtp-host" type="text" placeholder="smtp.gmail.com"></div>
+                    <div class="field"><label>SMTP port</label><input class="input" id="smtp-port" type="number" placeholder="587"></div>
+                    <div class="field"><label>Encryption</label><select class="select" id="smtp-encryption"><option>STARTTLS</option><option>SSL / TLS</option><option>None</option></select></div>
+                    <div class="field"><label>Authentication</label><select class="select" id="smtp-authentication"><option>Username and password</option><option>OAuth 2.0</option><option>No authentication</option></select></div>
+                    <div class="field"><label>SMTP username (advanced override)</label><input class="input" id="smtp-username" type="text" placeholder="Same as email address"></div>
+                    <div class="field"><label>From email (advanced override)</label><input class="input" id="smtp-from-email" type="email" placeholder="Same as email address"></div>
+                    <div class="field"><label>Reply-to email</label><input class="input" id="smtp-reply-to" type="email" placeholder="Optional support reply address"></div>
+                    <div class="field"><label>Connection timeout (seconds)</label><input class="input" id="smtp-timeout" type="number" min="3" max="60" placeholder="15" value="15"></div>
+                  </div>
+                </details>
+                <div class="form-actions"><button class="btn" type="reset">Reset fields</button><button class="btn btn-primary" type="submit">Save email settings</button></div>
               </form>
             </div>
           </section>
@@ -190,7 +197,7 @@
             <div class="card-head">
               <div>
                 <h2>Recent delivery activity</h2>
-                <p>Example notification log</p>
+                <p>Live email delivery attempts recorded by the backend</p>
               </div><a class="btn btn-sm" href="audit-log.html">View audit log</a>
             </div>
             <div class="table-wrap">

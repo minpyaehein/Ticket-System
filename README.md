@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 # Golden Pride Ticket Service System — Frontend + Python API + PostgreSQL
 
 This version connects the supplied HTML/CSS pages to a FastAPI backend and PostgreSQL. Existing page layouts and modules are kept; the inline prototype-only session checks have been replaced by a shared `js/app.js` client that talks to the backend. The application starts on its own, creates missing database tables and inserts starter/demo data on the first run. **You do not have to open `/docs` and manually POST a login or database record before you can sign in.** `/docs` is available only as optional API documentation/testing.
@@ -94,10 +93,17 @@ Use HTTPS in deployment and set `COOKIE_HTTPS_ONLY=true`. Configure a real rando
 
 ## Notes / limitations
 
-- Email settings are saved in PostgreSQL and the test-email button sends through the configured SMTP server. Real delivery will fail until valid SMTP settings and provider access are configured. OAuth 2.0 SMTP authentication is not implemented; choose username/password or no authentication.
-- The attachment field is retained as a reference/text field; file upload storage is not implemented.
+- Email settings are saved in PostgreSQL and the test-email button sends through the configured SMTP server. Configurable notifications support ticket creation, assignment, status changes, replies, due-date/SLA approaching, resolution, and an optional daily open-ticket summary at 09:00 Asia/Yangon. Real delivery requires valid SMTP settings and provider access. OAuth 2.0 SMTP authentication is not implemented; choose username/password or no authentication.
+- The attachment field is retained as a reference/text field; file upload storage is not implemented. Ticket edit forms reload the saved record before changes are submitted.
+- Audit Log stores successful login/logout, failed logins, create/update/delete changes, ticket replies, email delivery attempts, and daily summary activity. Audit records are read-only through the API.
 - The customer account is linked to the customer record by email, matching the supplied ERD without adding a `customer_id` foreign key to `users`.
 - Backend authorization applies to API calls, not just menu visibility. Demo data is for development only.
-=======
-# Ticket-System
->>>>>>> origin/main
+
+
+## Important: use the backend URL
+
+Do not double-click HTML pages or open them using a `file:///` address. This bypasses authentication, the Python API, database writes, email notifications, and audit logging. Start with `uvicorn main:app --reload --host 127.0.0.1 --port 8000`, then open `http://127.0.0.1:8000`.
+
+## Email notifications and audit log
+
+Configure SMTP from the administrator Email Notifications page, save settings, then send a test email. Ticket creation, assignment changes, status changes, replies, resolutions, login/logout, and CRUD operations are audit logged. Event email delivery requires valid SMTP settings and an enabled event rule; attempts are stored as `EMAIL_SENT` or `EMAIL_FAILED`.

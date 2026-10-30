@@ -24,23 +24,22 @@
             class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
             class="nav-icon">▧</span><span>Assets</span></a>
 
-        <a href="users.html" class="active"><span class="nav-icon">♟</span><span>customer
-            Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a
           href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles & Access</span></a><a
           href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a><a
           href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a>
       </nav>
       <div class="sidebar-bottom">
-        <div class="avatar">SA</div>
-        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
       </div>
-    </aside>
+</aside>
     <main class="main">
       <header class="topbar">
         <div>
           <div class="eyebrow">Golden Pride / Service Desk</div>
           <h1>Add customer</h1>
-          <p class="subtitle">Invite a team member to the service workspace</p>
+          <p class="subtitle">Create a customer organization profile</p>
         </div>
         <div class="top-actions">
           <form action="tickets.html" method="get" class="compact-search">
@@ -51,36 +50,24 @@
           </a>
         </div>
       </header>
-      <div class="breadcrumb"><a href="users.html">customer Management</a> / Add customer</div>
+      <div class="breadcrumb"><a href="customers.html">Customers</a> / Add customer</div>
       <section class="card">
         <div class="card-head">
           <div>
-            <h2>customer profile</h2>
+            <h2>Customer profile</h2>
           </div>
         </div>
         <div class="card-body">
-          <div class="notice">A real invitation requires a connected backend or email service.</div>
-          <form action="#" method="get">
+          <div class="notice">Create a customer organization profile. Changes are saved to the connected database when submitted.</div>
+          <form action="#" method="post">
             <div class="form-grid">
-              <div class="field "><label>Full name *</label><input class="input" type="text" placeholder="Full name"
-                  value=""></div>
-              <div class="field "><label>Email *</label><input class="input" type="email"
-                  placeholder="customer@company.com" value=""></div>
-              <div class="field "><label>Password *</label><input class="input" type="password"
-                  placeholder="Enter a temporary password" value=""></div>
-              <div class="field "><label>Role</label><select class="select">
-                  <option value="customer">customer</option>
-                  <option value="agent">Agent</option>
-                  <option value="admin">Administrator</option>
-                </select></div>
-              <div class="field "><label>Support Team *</label><select class="select"><option value="">Select support team</option></select></div>
-
-
-              <div class="field full"><label>Notes</label><textarea class="textarea"
-                  placeholder="Optional notes"></textarea></div>
+              <div class="field"><label>Company name *</label><input class="input" type="text" placeholder="Company name" required></div>
+              <div class="field"><label>Initial contact name</label><input class="input" type="text" placeholder="Contact full name"></div>
+              <div class="field"><label>General email</label><input class="input" type="email" placeholder="contact@company.com"></div>
+              <div class="field"><label>Phone</label><input class="input" type="tel" placeholder="+95 ..."></div>
+              <div class="field full"><label>Address</label><input class="input" type="text" placeholder="Address"></div>
             </div>
-            <div class="form-actions"><a class="btn" href="users.html">Cancel</a><button class="btn btn-primary"
-                type="submit">Create customer</button></div>
+            <div class="form-actions"><a class="btn" href="customers.html">Cancel</a><button class="btn btn-primary" type="submit">Create customer</button></div>
           </form>
         </div>
       </section>

@@ -4,7 +4,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>customer Management | Golden Pride</title>
+  <title>User Management | Golden Pride</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 
@@ -24,21 +24,20 @@
             class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
             class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
             class="nav-icon">▧</span><span>Assets</span></a><a href="users.html" class="active"><span
-            class="nav-icon">♟</span><span>customer
-            Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a
           href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles & Access</span></a><a
           href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a><a
           href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
       <div class="sidebar-bottom">
-        <div class="avatar">SA</div>
-        <div><strong>System Administrator</strong><small>admin@goldenpride.local</small></div>
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
       </div>
-    </aside>
+</aside>
     <main class="main">
       <header class="topbar">
         <div>
           <div class="eyebrow">Golden Pride / Service Desk</div>
-          <h1>customer Management</h1>
+          <h1>User Management</h1>
           <p class="subtitle">Manage workspace users, account status and team access</p>
         </div>
         <div class="top-actions">
@@ -47,7 +46,7 @@
             <button type="submit" aria-label="Search">⌕</button>
           </form> <a class="btn compact-alert" href="email-notifications.html">
             ♧ Alerts <span class="badge open">3</span>
-          </a><a class="btn btn-primary" href="add-customer.html">+ Add customer</a>
+          </a><a class="btn btn-primary" href="add-user.html">+ Add user</a>
         </div>
       </header>
       <section class="card">
@@ -69,11 +68,11 @@
       <section class="card">
         <div class="card-head">
           <div>
-            <h2>customer Management register</h2>
+            <h2>User Management register</h2>
             <p>Manage records and view related details</p>
           </div>
           <div class="inline"><a class="btn btn-sm" href="#">Export</a><a class="btn btn-primary btn-sm"
-              href="add-customer.html">+ Add customer</a></div>
+              href="add-user.html">+ Add user</a></div>
         </div>
         <div class="table-wrap">
           <table>
@@ -92,26 +91,26 @@
               <tr>
                 <td>Alex</td>
                 <td>admin@goldenpride.local</td>
-                <td>ADMIN123</td>
+                <td>••••••••</td>
                 <td>Admin</td>
                 <td>System Administrator</td>
-                <td><a class="btn btn-sm" href="add-customer.html">Edit</a></td>
+                <td><a class="btn btn-sm" href="add-user.html">Edit</a></td>
               </tr>
               <tr>
                 <td>Alex</td>
                 <td>admin@goldenpride.local</td>
-                <td>ADMIN123</td>
+                <td>••••••••</td>
                 <td>Admin</td>
                 <td>System Administrator</td>
-                <td><a class="btn btn-sm" href="add-customer.html">Edit</a></td>
+                <td><a class="btn btn-sm" href="add-user.html">Edit</a></td>
               </tr>
               <tr>
                 <td>Alex</td>
                 <td>admin@goldenpride.local</td>
-                <td>ADMIN123</td>
+                <td>••••••••</td>
                 <td>Admin</td>
                 <td>System Administrator</td>
-                <td><a class="btn btn-sm" href="add-customer.html">Edit</a></td>
+                <td><a class="btn btn-sm" href="add-user.html">Edit</a></td>
               </tr>
             </tbody>
           </table>

@@ -5,6 +5,7 @@ is the intended production database; configure DATABASE_URL in .env before runni
 """
 from __future__ import annotations
 
+import asyncio
 import base64
 import hashlib
 import hmac
@@ -12,11 +13,13 @@ import json
 import os
 import secrets
 import smtplib
+import socket
 import ssl
 from datetime import date, datetime, time
 from email.message import EmailMessage
 from pathlib import Path
 from typing import Any, Generator
+from zoneinfo import ZoneInfo
 
 from dotenv import load_dotenv
 from fastapi import Depends, FastAPI, HTTPException, Query, Request
@@ -25,7 +28,7 @@ from fastapi.responses import FileResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel, Field
 from sqlalchemy import (Boolean, Date, DateTime, Float, ForeignKey, Integer, String, Text,
-                        UniqueConstraint, create_engine, func, inspect, or_, select)
+                        UniqueConstraint, create_engine, func, inspect, or_, select, text)
 from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, sessionmaker
 from starlette.middleware.sessions import SessionMiddleware
@@ -161,6 +164,7 @@ class User(Base):
     team_id: Mapped[int | None] = mapped_column(ForeignKey("teams.team_id", ondelete="SET NULL"), index=True)
     notes: Mapped[str | None] = mapped_column(Text)
     active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
+    must_change_password: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
 
@@ -224,6 +228,7 @@ class TicketReply(Base):
     ticket_id: Mapped[int] = mapped_column(ForeignKey("tickets.ticket_id", ondelete="CASCADE"), nullable=False, index=True)
     user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id", ondelete="RESTRICT"), nullable=False)
     body: Mapped[str] = mapped_column(Text, nullable=False)
+    is_internal: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False)
 
 
@@ -240,15 +245,27 @@ class AuditLog(Base):
     audit_id: Mapped[int] = mapped_column(Integer, primary_key=True)
     user_id: Mapped[int | None] = mapped_column(ForeignKey("users.user_id", ondelete="SET NULL"))
     user_name: Mapped[str | None] = mapped_column(String(160))
+    actor_role: Mapped[str | None] = mapped_column(String(40))
     action: Mapped[str] = mapped_column(String(100), nullable=False)
     module: Mapped[str] = mapped_column(String(80), nullable=False)
+    entity_id: Mapped[str | None] = mapped_column(String(120))
+    entity_label: Mapped[str | None] = mapped_column(String(240))
+    ip_address: Mapped[str | None] = mapped_column(String(64))
     details: Mapped[str | None] = mapped_column(Text)
+    change_data: Mapped[str | None] = mapped_column(Text)
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, nullable=False, index=True)
 
 
 class EmailSetting(Base):
     __tablename__ = "email_settings"
     setting_id: Mapped[int] = mapped_column(Integer, primary_key=True, default=1)
+    settings_json: Mapped[str] = mapped_column(Text, default="{}", nullable=False)
+    updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
+
+
+class UserNotificationPreference(Base):
+    __tablename__ = "user_notification_preferences"
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.user_id", ondelete="CASCADE"), primary_key=True)
     settings_json: Mapped[str] = mapped_column(Text, default="{}", nullable=False)
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow, nullable=False)
 
@@ -261,12 +278,18 @@ class LoginBody(BaseModel):
 
 class ReplyBody(BaseModel):
     body: str = Field(min_length=1, max_length=10000)
+    is_internal: bool = False
 
 
 class RoleBody(BaseModel):
     role_key: str
     description: str = ""
     permissions: dict[str, Any] = Field(default_factory=dict)
+
+
+class ChangePasswordBody(BaseModel):
+    current_password: str = Field(min_length=1, max_length=300)
+    new_password: str = Field(min_length=10, max_length=300)
 
 
 class EmailSettingsBody(BaseModel):
@@ -322,7 +345,9 @@ def get_actor(request: Request, db: Session = Depends(get_db)) -> dict[str, Any]
     if not user or not user.active:
         request.session.clear()
         raise HTTPException(status_code=401, detail="Your session is no longer valid. Please sign in again.")
-    return {"user_id": user.user_id, "fullname": user.fullname, "email": user.email, "role": user.role, "team_id": user.team_id}
+    if user.must_change_password and request.url.path not in {"/api/auth/change-password", "/api/auth/logout"}:
+        raise HTTPException(status_code=403, detail="Change your temporary password before using the system.")
+    return {"user_id": user.user_id, "fullname": user.fullname, "email": user.email, "role": user.role, "team_id": user.team_id, "must_change_password": bool(user.must_change_password)}
 
 
 def admin_only(actor: dict[str, Any]) -> None:
@@ -335,10 +360,74 @@ def actor_customer_id(db: Session, actor: dict[str, Any]) -> int | None:
     return customer.customer_id if customer else None
 
 
-def log_action(db: Session, actor: dict[str, Any] | None, action: str, module: str, details: str = "") -> None:
-    db.add(AuditLog(user_id=actor.get("user_id") if actor else None,
-                    user_name=actor.get("fullname") if actor else "System",
-                    action=action, module=module, details=details[:2000]))
+def _json_safe(value: Any) -> Any:
+    return jsonable_encoder(value)
+
+
+def _client_ip(request: Request | None) -> str | None:
+    if request is None or request.client is None:
+        return None
+    # Do not trust arbitrary X-Forwarded-For headers; use the actual connected peer.
+    return str(request.client.host or "")[:64] or None
+
+
+def log_action(db: Session, actor: dict[str, Any] | None, action: str, module: str, details: str = "",
+               request: Request | None = None, entity_id: Any = None, entity_label: str | None = None,
+               changes: dict[str, Any] | None = None) -> None:
+    change_json = json.dumps(_json_safe(changes), ensure_ascii=False) if changes else None
+    db.add(AuditLog(
+        user_id=actor.get("user_id") if actor else None,
+        user_name=actor.get("fullname") if actor else "System",
+        actor_role=actor.get("role") if actor else "system",
+        action=action, module=module,
+        entity_id=str(entity_id)[:120] if entity_id is not None else None,
+        entity_label=str(entity_label)[:240] if entity_label else None,
+        ip_address=_client_ip(request), details=details[:2000], change_data=change_json,
+    ))
+
+
+def _entity_label(resource: str, row: Any, db: Session) -> str:
+    if resource == "tickets": return row.ticket_code or f"TKT-{row.ticket_id}"
+    if resource == "customers": return row.customer_name
+    if resource == "users": return f"{row.fullname} ({row.email})"
+    if resource == "projects": return row.project_name
+    if resource == "plans": return row.plan_name
+    if resource == "services": return row.name
+    if resource == "teams": return row.team_name
+    if resource == "contacts": return row.fullname
+    if resource == "contracts": return row.contract_code or row.contract_name
+    if resource == "assets": return row.asset_tag
+    return f"{resource} {getattr(row, RESOURCE_PK.get(resource, ''), '')}".strip()
+
+
+def _snapshot(row: Any) -> dict[str, Any]:
+    values = model_values(row)
+    # No password or secret material ever belongs in a change diff.
+    values.pop("password_hash", None)
+    values.pop("smtp_password", None)
+    return _json_safe(values)
+
+
+def _diff(before: dict[str, Any] | None, after: dict[str, Any] | None) -> dict[str, Any]:
+    before, after = before or {}, after or {}
+    changes = {}
+    for key in sorted(set(before) | set(after)):
+        if before.get(key) != after.get(key):
+            changes[key] = {"from": before.get(key), "to": after.get(key)}
+    return changes
+
+
+def _change_summary(changes: dict[str, Any], limit: int = 6) -> str:
+    def short(value: Any) -> str:
+        if value is None: return "—"
+        if isinstance(value, (dict, list)): value = json.dumps(value, ensure_ascii=False)
+        value = str(value).replace("\n", " ").strip()
+        return value if len(value) <= 100 else value[:97] + "…"
+    parts = []
+    for key, change in list(changes.items())[:limit]:
+        parts.append(f"{key.replace('_', ' ')}: {short(change.get('from'))} → {short(change.get('to'))}")
+    if len(changes) > limit: parts.append(f"+{len(changes)-limit} more field(s); open View Changes")
+    return "; ".join(parts)
 
 
 def model_values(row: Any) -> dict[str, Any]:
@@ -409,6 +498,14 @@ def serialize_row(db: Session, resource: str, row: Any) -> dict[str, Any]:
         item["service_code_ids"] = all_codes
     elif resource == "audit-logs":
         item["timestamp"] = item.get("created_at")
+        if not item.get("actor_role") and item.get("user_id"):
+            logged_user = db.get(User, item.get("user_id"))
+            if logged_user:
+                item["actor_role"] = logged_user.role
+        try:
+            item["changes"] = json.loads(item.get("change_data") or "{}")
+        except (json.JSONDecodeError, TypeError):
+            item["changes"] = {}
     elif resource == "role-permissions":
         try:
             item["permissions"] = json.loads(item.pop("permissions_json", "{}"))
@@ -433,25 +530,34 @@ def login(payload: LoginBody, request: Request, db: Session = Depends(get_db)) -
     email = payload.username.strip().lower()
     user = db.scalar(select(User).where(func.lower(User.email) == email))
     if not user or not user.active or not verify_password(payload.password, user.password_hash) or user.role != payload.role.lower():
-        log_action(db, None, "LOGIN_FAILED", "Authentication", f"Failed login for {email}")
+        log_action(db, None, "LOGIN_FAILED", "Authentication", f"Failed login for {email}", request=request, entity_label=email)
         db.commit()
         raise HTTPException(status_code=401, detail="The email, password, or selected role is incorrect.")
     request.session.clear()
     request.session["user_id"] = user.user_id
-    log_action(db, {"user_id": user.user_id, "fullname": user.fullname}, "LOGIN", "Authentication", f"Signed in as {user.role}")
+    log_action(db, {"user_id": user.user_id, "fullname": user.fullname, "role": user.role}, "LOGIN", "Authentication", f"Signed in as {user.role}", request=request, entity_id=user.user_id, entity_label=user.email)
     db.commit()
     return {"user_id": user.user_id, "fullname": user.fullname, "email": user.email, "role": user.role,
+            "must_change_password": bool(user.must_change_password),
             "home": {"admin": "admin-dashboard.html", "agent": "agent-dashboard.html", "customer": "user-dashboard.html"}[user.role]}
 
 
 @app.get("/api/auth/me")
-def me(actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
-    return actor
+def me(request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
+    user_id = request.session.get("user_id")
+    if not user_id:
+        raise HTTPException(status_code=401, detail="Please sign in to continue.")
+    user = db.get(User, int(user_id))
+    if not user or not user.active:
+        request.session.clear()
+        raise HTTPException(status_code=401, detail="Your session is no longer valid. Please sign in again.")
+    return {"user_id": user.user_id, "fullname": user.fullname, "email": user.email, "role": user.role,
+            "team_id": user.team_id, "must_change_password": bool(user.must_change_password)}
 
 
 @app.post("/api/auth/logout")
 def logout(request: Request, actor: dict[str, Any] = Depends(get_actor), db: Session = Depends(get_db)) -> dict[str, str]:
-    log_action(db, actor, "LOGOUT", "Authentication", "Signed out")
+    log_action(db, actor, "LOGOUT", "Authentication", "Signed out", request=request, entity_id=actor.get("user_id"), entity_label=actor.get("email"))
     db.commit()
     request.session.clear()
     return {"message": "Signed out successfully."}
@@ -511,6 +617,97 @@ def dashboard_stats(db: Session = Depends(get_db), actor: dict[str, Any] = Depen
             "recent_tickets": [serialize_row(db, "tickets", t) for t in tickets[:8]]}
 
 
+def _default_user_notification_preferences(role: str) -> dict[str, bool]:
+    base = {"ticket_created": True, "ticket_assigned": True, "status_changed": True,
+            "new_reply": True, "sla_approaching": True, "ticket_resolved": True,
+            "daily_summary": role in {"admin", "agent"}}
+    return base
+
+
+@app.get("/api/notification-preferences")
+def get_notification_preferences(db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+    row = db.get(UserNotificationPreference, actor["user_id"])
+    values = _default_user_notification_preferences(actor["role"])
+    if row:
+        try: values.update({k: bool(v) for k, v in json.loads(row.settings_json or "{}").items() if k in values})
+        except (json.JSONDecodeError, AttributeError): pass
+    return {"preferences": values}
+
+
+@app.put("/api/notification-preferences")
+def put_notification_preferences(payload: dict[str, Any], request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+    submitted = payload.get("preferences", payload)
+    if not isinstance(submitted, dict):
+        raise HTTPException(status_code=422, detail="Preferences must be an object.")
+    current = db.get(UserNotificationPreference, actor["user_id"])
+    values = _default_user_notification_preferences(actor["role"])
+    if current:
+        try: values.update({k: bool(v) for k, v in json.loads(current.settings_json or "{}").items() if k in values})
+        except (json.JSONDecodeError, AttributeError): pass
+    for key in values:
+        if key in submitted: values[key] = bool(submitted[key])
+    row = current or UserNotificationPreference(user_id=actor["user_id"], settings_json="{}")
+    row.settings_json = json.dumps(values)
+    db.add(row)
+    log_action(db, actor, "UPDATE_PREFERENCES", "Email notifications", "Updated personal email notification preferences", request=request, entity_id=actor["user_id"], entity_label=actor.get("email"), changes={k:{"from":"previous setting","to":v} for k,v in values.items() if k in submitted})
+    db.commit()
+    return {"message": "Your email notification preferences were saved.", "preferences": values}
+
+
+@app.post("/api/auth/change-password")
+def change_password(payload: ChangePasswordBody, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
+    user = db.get(User, actor["user_id"])
+    if not user or not verify_password(payload.current_password, user.password_hash):
+        raise HTTPException(status_code=400, detail="The current or temporary password is incorrect.")
+    if payload.current_password == payload.new_password:
+        raise HTTPException(status_code=422, detail="Choose a new password different from the temporary password.")
+    before = {"must_change_password": bool(user.must_change_password)}
+    user.password_hash = hash_password(payload.new_password)
+    user.must_change_password = False
+    log_action(db, actor, "PASSWORD_CHANGED", "Authentication", "User changed their password", request=request, entity_id=user.user_id, entity_label=user.email, changes={"must_change_password":{"from":before["must_change_password"],"to":False}})
+    db.commit()
+    return {"message": "Password changed successfully. You can now continue to your dashboard."}
+
+
+@app.post("/api/users/{user_id}/reset-password")
+def admin_reset_password(user_id: int, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
+    admin_only(actor)
+    user = db.get(User, user_id)
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+    if user.role != "customer":
+        raise HTTPException(status_code=400, detail="This reset action is only for customer accounts.")
+    setting = db.get(EmailSetting, 1)
+    cfg = json.loads(setting.settings_json or "{}") if setting else {}
+    if not cfg.get("smtp_host") or not cfg.get("from_email"):
+        raise HTTPException(status_code=400, detail="Configure and save SMTP settings before resetting a customer password.")
+    alphabet = "ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789!@#$%"
+    temp_password = "".join(secrets.choice(alphabet) for _ in range(16))
+    subject = "Golden Pride — temporary password for your account"
+    body = (f"Hello {user.fullname},\n\nAn administrator reset the password for your Golden Pride account.\n\n"
+            f"Temporary password: {temp_password}\n\nSign in with this temporary password. You will be required to change it before continuing."
+            " If you did not request this, contact your support administrator.\n\nGolden Pride Support")
+    old_hash, old_flag = user.password_hash, bool(user.must_change_password)
+    user.password_hash = hash_password(temp_password)
+    user.must_change_password = True
+    try:
+        db.commit()
+        _send_notification_email(cfg, [user.email], subject, body)
+    except Exception as exc:
+        db.rollback()
+        # If delivery failed after the first commit, restore the old credential so
+        # we never strand the customer with a password they did not receive.
+        refreshed = db.get(User, user_id)
+        if refreshed:
+            refreshed.password_hash, refreshed.must_change_password = old_hash, old_flag
+            log_action(db, actor, "PASSWORD_RESET_EMAIL_FAILED", "User Management", f"Temporary password email failed for customer {user.email}: {str(exc)[:250]}", request=request, entity_id=user.user_id, entity_label=user.email)
+            db.commit()
+        raise HTTPException(status_code=400, detail=f"Temporary password was not issued because email delivery failed: {str(exc)[:250]}") from exc
+    log_action(db, actor, "PASSWORD_RESET", "User Management", f"Admin issued a temporary password and emailed customer {user.email}; password change required at next sign in", request=request, entity_id=user.user_id, entity_label=user.email, changes={"must_change_password":{"from":old_flag,"to":True}})
+    db.commit()
+    return {"message": f"Temporary password sent to {user.email}. Customer must change it at next sign in."}
+
+
 @app.get("/api/email-settings")
 def get_email_settings(db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     admin_only(actor)
@@ -522,7 +719,7 @@ def get_email_settings(db: Session = Depends(get_db), actor: dict[str, Any] = De
 
 
 @app.put("/api/email-settings")
-def put_email_settings(payload: EmailSettingsBody, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+def put_email_settings(payload: EmailSettingsBody, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     admin_only(actor)
     current = db.get(EmailSetting, 1)
     settings = json.loads(current.settings_json) if current else {}
@@ -532,7 +729,9 @@ def put_email_settings(payload: EmailSettingsBody, db: Session = Depends(get_db)
     row = current or EmailSetting(setting_id=1, settings_json="{}")
     row.settings_json = json.dumps(data)
     db.add(row)
-    log_action(db, actor, "UPDATE", "Email settings", f"Updated SMTP settings for host {data.get('smtp_host','')}")
+    safe_keys = (set(settings) | set(data)) - {"smtp_password"}
+    changes = {key: {"from": settings.get(key), "to": data.get(key)} for key in sorted(safe_keys) if settings.get(key) != data.get(key)}
+    log_action(db, actor, "UPDATE", "Email settings", f"Updated SMTP settings for host {data.get('smtp_host','')}", request=request, entity_id=1, entity_label="SMTP configuration", changes=changes)
     try:
         db.commit()
     except IntegrityError:
@@ -542,7 +741,7 @@ def put_email_settings(payload: EmailSettingsBody, db: Session = Depends(get_db)
 
 
 @app.post("/api/email-settings/test")
-def test_email(payload: dict[str, str], db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
+def test_email(payload: dict[str, str], request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
     admin_only(actor)
     recipient = (payload.get("recipient") or "").strip()
     if not recipient or "@" not in recipient:
@@ -577,10 +776,131 @@ def test_email(payload: dict[str, str], db: Session = Depends(get_db), actor: di
                 _smtp_auth(server, cfg)
                 server.send_message(message)
     except Exception as exc:
+        if isinstance(exc, socket.gaierror):
+            exc = RuntimeError(f"SMTP host '{host}' could not be resolved. Check the SMTP host value and your internet/DNS connection. For Gmail choose the Gmail provider preset (smtp.gmail.com); do not enter an email address or URL in the host field.")
+        log_action(db, actor, "EMAIL_FAILED", "Email settings", f"Test email to {recipient} failed: {str(exc)[:300]}", request=request, entity_label=recipient)
+        db.commit()
         raise HTTPException(status_code=400, detail=f"Email delivery failed: {str(exc)[:300]}") from exc
-    log_action(db, actor, "SEND_TEST", "Email settings", f"Sent a test notification to {recipient}")
+    log_action(db, actor, "SEND_TEST", "Email settings", f"Sent a test notification to {recipient}", request=request, entity_label=recipient)
     db.commit()
     return {"message": f"Test email sent to {recipient}."}
+
+
+def _send_notification_email(cfg: dict[str, Any], recipients: list[str], subject: str, body: str) -> None:
+    """Send one SMTP message to a deduplicated recipient list."""
+    recipients = sorted({str(x).strip() for x in recipients if x and "@" in str(x)})
+    host = str(cfg.get("smtp_host", "")).strip()
+    from_email = str(cfg.get("from_email", "")).strip()
+    if not recipients or not host or not from_email:
+        return
+    message = EmailMessage()
+    message["Subject"] = subject
+    message["From"] = f"{cfg.get('from_name', 'Golden Pride Support')} <{from_email}>"
+    message["To"] = ", ".join(recipients)
+    if cfg.get("reply_to_email"):
+        message["Reply-To"] = cfg["reply_to_email"]
+    message.set_content(body)
+    timeout = max(3, min(int(cfg.get("timeout") or 15), 60))
+    port = int(cfg.get("smtp_port") or 587)
+    try:
+        if cfg.get("encryption") == "SSL / TLS":
+            with smtplib.SMTP_SSL(host, port, timeout=timeout, context=ssl.create_default_context()) as server:
+                _smtp_auth(server, cfg)
+                server.send_message(message)
+        else:
+            with smtplib.SMTP(host, port, timeout=timeout) as server:
+                server.ehlo()
+                if cfg.get("encryption", "STARTTLS") == "STARTTLS":
+                    server.starttls(context=ssl.create_default_context())
+                    server.ehlo()
+                _smtp_auth(server, cfg)
+                server.send_message(message)
+    except socket.gaierror as exc:
+        raise RuntimeError(f"SMTP host '{host}' could not be resolved. Check Email Notifications > SMTP host and internet/DNS connectivity. For Gmail choose the Gmail provider preset (smtp.gmail.com). Do not enter an email address or URL in the host field.") from exc
+
+
+def _user_allows_event(db: Session, email: str, event: str) -> bool:
+    user = db.scalar(select(User).where(func.lower(User.email) == email.lower(), User.active.is_(True)))
+    if not user:
+        return True  # Customer contact addresses may not have portal logins.
+    row = db.get(UserNotificationPreference, user.user_id)
+    if not row:
+        return True
+    try:
+        prefs = json.loads(row.settings_json or "{}")
+        return bool(prefs.get(event, True))
+    except (json.JSONDecodeError, AttributeError):
+        return True
+
+
+def notify_ticket_event(db: Session, event: str, ticket: Ticket, actor: dict[str, Any] | None = None, extra: str = "", request: Request | None = None) -> None:
+    """Send configured role-based ticket notifications and record delivery attempts in audit_logs."""
+    try:
+        setting = db.get(EmailSetting, 1)
+        if not setting:
+            return
+        cfg = json.loads(setting.settings_json or "{}")
+        if not bool((cfg.get("event_rules") or {}).get(event, False)):
+            return
+        if not cfg.get("smtp_host") or not cfg.get("from_email"):
+            log_action(db, actor, "EMAIL_SKIPPED", "Email notifications", f"Event {event}; ticket {ticket.ticket_code or ticket.ticket_id}; SMTP host or From email is not configured", request=request, entity_id=ticket.ticket_id, entity_label=ticket.ticket_code or f"TKT-{ticket.ticket_id}")
+            db.commit()
+            return
+        customer = db.get(Customer, ticket.customer_id) if ticket.customer_id else None
+        customer_email = customer.email if customer else None
+        assigned_user = None
+        if ticket.assigned:
+            assigned_user = db.scalar(select(User).where(func.lower(User.fullname) == str(ticket.assigned).strip().lower(), User.active.is_(True)))
+        agent_emails = [u.email for u in db.scalars(select(User).where(User.role == "agent", User.active.is_(True))).all() if u.email]
+        admin_emails = [u.email for u in db.scalars(select(User).where(User.role == "admin", User.active.is_(True))).all() if u.email]
+        ticket_no = ticket.ticket_code or f"TKT-{ticket.ticket_id}"
+        actor_name = actor.get("fullname") if actor else "the system"
+        if event == "ticket_created":
+            recipients = admin_emails + agent_emails + ([customer_email] if customer_email else [])
+            subject = f"New ticket {ticket_no}: {ticket.subject}"
+            action = f"A new ticket was created by {actor_name}."
+        elif event == "ticket_assigned":
+            recipients = ([assigned_user.email] if assigned_user else []) + admin_emails
+            subject = f"Ticket assigned: {ticket_no}"
+            action = f"Ticket {ticket_no} is assigned to {ticket.assigned or 'an unassigned queue'}."
+        elif event == "status_changed":
+            recipients = ([customer_email] if customer_email else []) + ([assigned_user.email] if assigned_user else []) + admin_emails
+            subject = f"Ticket status changed: {ticket_no}"
+            action = f"The ticket status is now {ticket.status}."
+        elif event == "new_reply":
+            if actor and actor.get("role") == "customer":
+                recipients = ([assigned_user.email] if assigned_user else []) + agent_emails + admin_emails
+            else:
+                recipients = [customer_email] if customer_email else []
+            subject = f"New reply on ticket {ticket_no}: {ticket.subject}"
+            action = f"A new reply was added by {actor_name}."
+        elif event == "ticket_resolved":
+            recipients = ([customer_email] if customer_email else []) + admin_emails
+            subject = f"Ticket resolved: {ticket_no}"
+            action = f"The ticket was marked {ticket.status}."
+        elif event == "sla_approaching":
+            recipients = ([customer_email] if customer_email else []) + ([assigned_user.email] if assigned_user else []) + admin_emails
+            subject = f"Due date approaching: {ticket_no}"
+            due = ticket.due_date.isoformat() if ticket.due_date else "not set"
+            action = f"Ticket due date is approaching ({due}). Please review the ticket and its SLA status."
+        else:
+            return
+        recipients = sorted({str(r).strip() for r in recipients if r and "@" in str(r)})
+        recipients = [email for email in recipients if _user_allows_event(db, email, event)]
+        if not recipients:
+            log_action(db, actor, "EMAIL_SKIPPED", "Email notifications", f"Event {event}; all recipients have disabled this notification or no recipient address was available", request=request, entity_id=ticket.ticket_id, entity_label=ticket.ticket_code or f"TKT-{ticket.ticket_id}")
+            db.commit()
+            return
+        body = ("Hello,\n\n" + action + "\n\n" + f"Ticket: {ticket_no}\nSubject: {ticket.subject}\nStatus: {ticket.status}\nPriority: {ticket.priority}\nAssigned to: {ticket.assigned or 'Unassigned'}\n" + (f"\nDetails: {extra}\n" if extra else "") + "\nGolden Pride Service Desk")
+        _send_notification_email(cfg, recipients, subject, body)
+        log_action(db, actor, "EMAIL_SENT", "Email notifications", f"Event {event}; ticket {ticket_no}; recipients: {', '.join(recipients)}", request=request, entity_id=ticket.ticket_id, entity_label=ticket_no)
+        db.commit()
+    except Exception as exc:
+        try:
+            log_action(db, actor, "EMAIL_FAILED", "Email notifications", f"Event {event}; ticket {ticket.ticket_code or ticket.ticket_id}; error: {str(exc)[:350]}", request=request, entity_id=ticket.ticket_id, entity_label=ticket.ticket_code or f"TKT-{ticket.ticket_id}")
+            db.commit()
+        except Exception:
+            db.rollback()
 
 
 def _smtp_auth(server: smtplib.SMTP, cfg: dict[str, Any]) -> None:
@@ -600,7 +920,7 @@ def list_role_permissions(db: Session = Depends(get_db), actor: dict[str, Any] =
 
 
 @app.post("/api/role-permissions")
-def create_role_permission(payload: RoleBody, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+def create_role_permission(payload: RoleBody, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     admin_only(actor)
     key = payload.role_key.strip()
     row = db.scalar(select(RolePermission).where(func.lower(RolePermission.role_key) == key.lower()))
@@ -629,30 +949,42 @@ def list_ticket_replies(ticket_id: int, db: Session = Depends(get_db), actor: di
         raise HTTPException(status_code=404, detail="Ticket not found.")
     if actor["role"] == "customer" and ticket.customer_id != actor_customer_id(db, actor):
         raise HTTPException(status_code=403, detail="You can only view replies on your own tickets.")
-    rows = db.scalars(select(TicketReply).where(TicketReply.ticket_id == ticket_id).order_by(TicketReply.created_at)).all()
+    query = select(TicketReply).where(TicketReply.ticket_id == ticket_id)
+    # Internal notes are strictly staff-only. Enforce this at the API, not just in the UI.
+    if actor["role"] == "customer":
+        query = query.where(TicketReply.is_internal.is_(False))
+    rows = db.scalars(query.order_by(TicketReply.created_at)).all()
     results = []
     for r in rows:
         user = db.get(User, r.user_id)
         results.append({"reply_id": r.reply_id, "ticket_id": r.ticket_id, "user_id": r.user_id,
-                        "user_name": user.fullname if user else "System", "body": r.body, "created_at": r.created_at})
+                        "user_name": user.fullname if user else "System", "body": r.body,
+                        "is_internal": bool(r.is_internal), "created_at": r.created_at})
     return jsonable_encoder(results)
 
 
 @app.post("/api/tickets/{ticket_id}/replies")
-def create_ticket_reply(ticket_id: int, payload: ReplyBody, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+def create_ticket_reply(ticket_id: int, payload: ReplyBody, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     ticket = db.get(Ticket, ticket_id)
     if not ticket:
         raise HTTPException(status_code=404, detail="Ticket not found.")
     if actor["role"] == "customer" and ticket.customer_id != actor_customer_id(db, actor):
         raise HTTPException(status_code=403, detail="You can only reply to your own tickets.")
-    reply = TicketReply(ticket_id=ticket_id, user_id=actor["user_id"], body=payload.body.strip())
+    if payload.is_internal and actor["role"] not in {"admin", "agent"}:
+        raise HTTPException(status_code=403, detail="Only Admin and Agent can create internal notes.")
+    reply = TicketReply(ticket_id=ticket_id, user_id=actor["user_id"], body=payload.body.strip(), is_internal=payload.is_internal)
     db.add(reply)
     ticket.updated_at = datetime.utcnow()
-    log_action(db, actor, "REPLY", "Tickets", f"Added reply to ticket {ticket.ticket_code or ticket.ticket_id}")
+    action = "INTERNAL_NOTE" if reply.is_internal else "REPLY"
+    summary = f"Added internal note to ticket {ticket.ticket_code or ticket.ticket_id}" if reply.is_internal else f"Added reply to ticket {ticket.ticket_code or ticket.ticket_id}"
+    log_action(db, actor, action, "Tickets", summary, request=request, entity_id=ticket.ticket_id, entity_label=ticket.ticket_code or f"TKT-{ticket.ticket_id}", changes={"internal":{"from":None,"to":True}} if reply.is_internal else {"reply":{"from":None,"to":payload.body.strip()[:500]}})
     db.commit()
     db.refresh(reply)
+    # Internal notes must never be emailed to the customer.
+    if not reply.is_internal:
+        notify_ticket_event(db, "new_reply", ticket, actor, payload.body.strip()[:500], request=request)
     return {"reply_id": reply.reply_id, "ticket_id": reply.ticket_id, "user_id": reply.user_id,
-            "user_name": actor["fullname"], "body": reply.body, "created_at": reply.created_at}
+            "user_name": actor["fullname"], "body": reply.body, "is_internal": bool(reply.is_internal), "created_at": reply.created_at}
 
 
 # ---------- Database-backed CRUD for every ERD module ----------
@@ -743,7 +1075,7 @@ def clean_payload(resource: str, payload: dict[str, Any], row: Any | None = None
     pk = RESOURCE_PK[resource]
     accepted: dict[str, Any] = {}
     for key, value in payload.items():
-        if key in {"password_hash", "created_at", "updated_at", "permissions_json"}:
+        if key in {"password_hash", "created_at", "updated_at", "permissions_json", "must_change_password"}:
             continue
         # Service catalog codes are user-supplied string primary keys (e.g. SRV-001),
         # unlike the auto-incrementing integer IDs on the other entities.
@@ -793,7 +1125,7 @@ def scope_rows(db: Session, resource: str, rows: list[Any], actor: dict[str, Any
 
 
 @app.get("/api/{resource}")
-def list_resource(resource: str, request: Request, search: str = Query(default=""), db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> list[dict[str, Any]]:
+def list_resource(resource: str, request: Request, search: str = Query(default=""), action: str = Query(default=""), entity: str = Query(default=""), from_date: str = Query(default=""), to_date: str = Query(default=""), db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> list[dict[str, Any]]:
     if resource not in RESOURCE_MODELS:
         raise HTTPException(status_code=404, detail="Unknown API resource.")
     check_resource_access(resource, actor, "read")
@@ -814,12 +1146,28 @@ def list_resource(resource: str, request: Request, search: str = Query(default="
     rows = scope_rows(db, resource, list(rows), actor)
     if search.strip():
         term = search.casefold()
-        rows = [r for r in rows if term in " ".join(str(v or "") for v in model_values(r).values()).casefold()]
+        if resource == "audit-logs":
+            rows = [r for r in rows if term in " ".join(str(v or "") for v in (r.user_name, r.actor_role, r.action, r.module, r.entity_id, r.entity_label, r.details, r.ip_address)).casefold()]
+        else:
+            rows = [r for r in rows if term in " ".join(str(v or "") for v in model_values(r).values()).casefold()]
+    if resource == "audit-logs":
+        if action and action.casefold() not in {"all actions", "all"}:
+            rows = [r for r in rows if r.action.casefold() == action.casefold()]
+        if entity and entity.casefold() not in {"all entities", "all"}:
+            rows = [r for r in rows if entity.casefold() in " ".join([str(r.module or ""), str(r.entity_label or ""), str(r.entity_id or "")]).casefold()]
+        if from_date:
+            try: start = date.fromisoformat(from_date)
+            except ValueError: raise HTTPException(status_code=422, detail="from_date must be YYYY-MM-DD.")
+            rows = [r for r in rows if r.created_at.date() >= start]
+        if to_date:
+            try: end = date.fromisoformat(to_date)
+            except ValueError: raise HTTPException(status_code=422, detail="to_date must be YYYY-MM-DD.")
+            rows = [r for r in rows if r.created_at.date() <= end]
     return jsonable_encoder([serialize_row(db, resource, row) for row in rows])
 
 
 @app.post("/api/{resource}")
-def create_resource(resource: str, payload: dict[str, Any], db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+def create_resource(resource: str, payload: dict[str, Any], request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     if resource not in RESOURCE_MODELS:
         raise HTTPException(status_code=404, detail="Unknown API resource.")
     check_resource_access(resource, actor, "create")
@@ -861,9 +1209,20 @@ def create_resource(resource: str, payload: dict[str, Any], db: Session = Depend
             else:
                 cust.customer_name = row.fullname
                 cust.contact_name = row.fullname
-        log_action(db, actor, "CREATE", resource, f"Created {resource} record {getattr(row, RESOURCE_PK[resource])}")
+        row_id = getattr(row, RESOURCE_PK[resource])
+        row_label = _entity_label(resource, row, db)
+        create_changes = {k: {"from": None, "to": v} for k, v in _snapshot(row).items() if k not in {"created_at", "updated_at"}}
+        create_summary = _change_summary(create_changes, limit=4)
+        details = f"Created {resource} record {row_label}" + (f"; initial values: {create_summary}" if create_summary else "")
+        log_action(db, actor, "CREATE", resource, details, request=request, entity_id=row_id, entity_label=row_label, changes=create_changes)
         db.commit()
         db.refresh(row)
+        if resource == "tickets":
+            notify_ticket_event(db, "ticket_created", row, actor, request=request)
+            if row.assigned:
+                notify_ticket_event(db, "ticket_assigned", row, actor, request=request)
+            if row.due_date and 0 <= (row.due_date - date.today()).days <= 1:
+                notify_ticket_event(db, "sla_approaching", row, actor, request=request)
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=409, detail="This record conflicts with existing data or a required relationship is missing. Check unique codes, email, and foreign keys.") from exc
@@ -901,7 +1260,7 @@ def get_resource(resource: str, item_id: str, db: Session = Depends(get_db), act
 
 
 @app.put("/api/{resource}/{item_id}")
-def update_resource(resource: str, item_id: str, payload: dict[str, Any], db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
+def update_resource(resource: str, item_id: str, payload: dict[str, Any], request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, Any]:
     if resource not in RESOURCE_MODELS:
         raise HTTPException(status_code=404, detail="Unknown API resource.")
     check_resource_access(resource, actor, "update")
@@ -921,9 +1280,17 @@ def update_resource(resource: str, item_id: str, payload: dict[str, Any], db: Se
     if actor["role"] == "agent" and resource == "tickets" and actor["role"] != "admin":
         # Agent can update operational fields but cannot change ownership/relationship fields.
         payload = {k: v for k, v in payload.items() if k in {"status", "priority", "assigned", "due_date"}}
+    before_snapshot = _snapshot(row)
+    before_label = _entity_label(resource, row, db)
     service_codes = payload.get("service_codes") if resource == "teams" else None
     old_customer_email = row.email if resource == "customers" else None
+    previous_ticket_status = row.status if resource == "tickets" else None
+    previous_ticket_assigned = row.assigned if resource == "tickets" else None
+    previous_ticket_due_date = row.due_date if resource == "tickets" else None
     data = clean_payload(resource, payload, row)
+    changed_fields = [key for key, value in data.items() if getattr(row, key, None) != value]
+    if resource == "users" and payload.get("password"):
+        changed_fields.append("password (updated)")
     for key, value in data.items():
         setattr(row, key, value)
     if resource == "customers" and old_customer_email:
@@ -948,9 +1315,22 @@ def update_resource(resource: str, item_id: str, payload: dict[str, Any], db: Se
             cust.customer_name = row.fullname
             cust.contact_name = row.fullname
     try:
-        log_action(db, actor, "UPDATE", resource, f"Updated {resource} record {item_id}")
+        after_snapshot = _snapshot(row)
+        change_map = _diff(before_snapshot, after_snapshot)
+        change_map = {k: v for k, v in change_map.items() if k not in {"updated_at", "password_hash"}}
+        detail = f"Updated {resource} record {before_label}" + (f"; {_change_summary(change_map)}" if change_map else "; no field values changed")
+        log_action(db, actor, "UPDATE", resource, detail, request=request, entity_id=getattr(row, RESOURCE_PK[resource]), entity_label=_entity_label(resource, row, db), changes=change_map)
         db.commit()
         db.refresh(row)
+        if resource == "tickets":
+            if previous_ticket_assigned != row.assigned and row.assigned:
+                notify_ticket_event(db, "ticket_assigned", row, actor, request=request)
+            if previous_ticket_status != row.status:
+                notify_ticket_event(db, "status_changed", row, actor, f"Previous status: {previous_ticket_status or '—'}", request=request)
+                if str(row.status).strip().lower() in {"resolved", "closed"}:
+                    notify_ticket_event(db, "ticket_resolved", row, actor, request=request)
+            if row.due_date and previous_ticket_due_date != row.due_date and 0 <= (row.due_date - date.today()).days <= 1:
+                notify_ticket_event(db, "sla_approaching", row, actor, request=request)
     except IntegrityError as exc:
         db.rollback()
         raise HTTPException(status_code=409, detail="Update conflicts with existing data or a foreign-key relationship.") from exc
@@ -958,7 +1338,7 @@ def update_resource(resource: str, item_id: str, payload: dict[str, Any], db: Se
 
 
 @app.delete("/api/{resource}/{item_id}")
-def delete_resource(resource: str, item_id: str, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
+def delete_resource(resource: str, item_id: str, request: Request, db: Session = Depends(get_db), actor: dict[str, Any] = Depends(get_actor)) -> dict[str, str]:
     if resource not in RESOURCE_MODELS:
         raise HTTPException(status_code=404, detail="Unknown API resource.")
     check_resource_access(resource, actor, "delete")
@@ -973,8 +1353,11 @@ def delete_resource(resource: str, item_id: str, db: Session = Depends(get_db), 
     row = db.get(model, lookup)
     if not row:
         raise HTTPException(status_code=404, detail="Record not found.")
+    deleted_snapshot = _snapshot(row)
+    deleted_label = _entity_label(resource, row, db)
     db.delete(row)
-    log_action(db, actor, "DELETE", resource, f"Deleted {resource} record {item_id}")
+    delete_changes = {k: {"from": v, "to": None} for k, v in deleted_snapshot.items() if k not in {"created_at", "updated_at"}}
+    log_action(db, actor, "DELETE", resource, f"Deleted {resource} record {deleted_label}", request=request, entity_id=item_id, entity_label=deleted_label, changes=delete_changes)
     try:
         db.commit()
     except IntegrityError as exc:
@@ -1075,10 +1458,106 @@ def seed_database() -> None:
         db.close()
 
 
+async def daily_summary_loop() -> None:
+    """Send an optional once-daily open-ticket digest at 09:00 Asia/Yangon."""
+    while True:
+        now = datetime.now(ZoneInfo("Asia/Yangon"))
+        if now.hour == 9 and now.minute == 0:
+            run_date = now.date().isoformat()
+            db = SessionLocal()
+            try:
+                setting = db.get(EmailSetting, 1)
+                cfg = json.loads(setting.settings_json or "{}") if setting else {}
+                if (cfg.get("event_rules") or {}).get("daily_summary", False):
+                    marker = f"Daily summary sent for {run_date}"
+                    already_sent = db.scalar(select(AuditLog.audit_id).where(
+                        AuditLog.action == "DAILY_SUMMARY", AuditLog.details.like(f"{marker}%")
+                    ))
+                    if not already_sent:
+                        recipients = [u.email for u in db.scalars(select(User).where(
+                            User.active.is_(True), User.role.in_(["admin", "agent"])
+                        )).all() if u.email and _user_allows_event(db, u.email, "daily_summary")]
+                        if not cfg.get("smtp_host") or not cfg.get("from_email"):
+                            log_action(db, None, "EMAIL_SKIPPED", "Email notifications", f"Daily summary {run_date}; SMTP settings are incomplete")
+                            db.commit()
+                        elif recipients:
+                            open_tickets = db.scalars(select(Ticket).where(
+                                func.lower(Ticket.status).not_in(["resolved", "closed"])
+                            ).order_by(Ticket.due_date, Ticket.updated_at.desc()).limit(40)).all()
+                            lines = [f"{t.ticket_code or ('TKT-' + str(t.ticket_id))} | {t.status} | {t.priority} | due {t.due_date or 'not set'} | {t.subject}" for t in open_tickets]
+                            body = "Golden Pride daily ticket summary\n\n" + f"Open tickets listed: {len(open_tickets)}\n\n" + ("\n".join(lines) if lines else "There are no open tickets.")
+                            try:
+                                _send_notification_email(cfg, recipients, f"Golden Pride daily ticket summary — {run_date}", body)
+                                log_action(db, None, "DAILY_SUMMARY", "Email notifications", f"{marker}; open tickets listed: {len(open_tickets)}; recipients: {', '.join(recipients)}")
+                                db.commit()
+                            except Exception as exc:
+                                log_action(db, None, "EMAIL_FAILED", "Email notifications", f"Daily summary {run_date} failed: {str(exc)[:300]}")
+                                db.commit()
+            except Exception as exc:
+                db.rollback()
+                try:
+                    log_action(db, None, "EMAIL_FAILED", "Email notifications", f"Daily summary scheduler error: {str(exc)[:300]}")
+                    db.commit()
+                except Exception:
+                    db.rollback()
+            finally:
+                db.close()
+            await asyncio.sleep(60)
+        else:
+            await asyncio.sleep(30)
+
+
+_daily_summary_task: asyncio.Task | None = None
+
+
+def migrate_legacy_schema() -> None:
+    """Add fields introduced after existing installations were created."""
+    inspector = inspect(engine)
+    if "audit_logs" in inspector.get_table_names():
+        existing = {col["name"] for col in inspector.get_columns("audit_logs")}
+        additions = {
+            "actor_role": "VARCHAR(40)",
+            "entity_id": "VARCHAR(120)",
+            "entity_label": "VARCHAR(240)",
+            "ip_address": "VARCHAR(64)",
+            "change_data": "TEXT",
+        }
+        missing = [(name, ddl) for name, ddl in additions.items() if name not in existing]
+        if missing:
+            with engine.begin() as conn:
+                for name, ddl in missing:
+                    conn.execute(text(f"ALTER TABLE audit_logs ADD COLUMN {name} {ddl}"))
+    if "users" in inspector.get_table_names():
+        existing = {col["name"] for col in inspector.get_columns("users")}
+        if "must_change_password" not in existing:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE users ADD COLUMN must_change_password BOOLEAN NOT NULL DEFAULT FALSE"))
+    if "ticket_replies" in inspector.get_table_names():
+        existing = {col["name"] for col in inspector.get_columns("ticket_replies")}
+        if "is_internal" not in existing:
+            with engine.begin() as conn:
+                conn.execute(text("ALTER TABLE ticket_replies ADD COLUMN is_internal BOOLEAN NOT NULL DEFAULT FALSE"))
+
+
 @app.on_event("startup")
 def startup() -> None:
+    global _daily_summary_task
     Base.metadata.create_all(bind=engine)
+    migrate_legacy_schema()
     seed_database()
+    _daily_summary_task = asyncio.create_task(daily_summary_loop())
+
+
+@app.on_event("shutdown")
+async def shutdown() -> None:
+    global _daily_summary_task
+    if _daily_summary_task:
+        _daily_summary_task.cancel()
+        try:
+            await _daily_summary_task
+        except asyncio.CancelledError:
+            pass
+        _daily_summary_task = None
 
 
 # Keep the original standalone HTML pages and CSS, now served on the API's origin.

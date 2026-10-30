@@ -4,11 +4,22 @@
   const file = (location.pathname.split('/').pop() || 'login.html').toLowerCase();
   const params = new URLSearchParams(location.search);
   const idParam = params.get('id');
+  const scrollKey = 'gpScroll:' + location.pathname + location.search;
+  if ('scrollRestoration' in history) history.scrollRestoration = 'manual';
+  window.addEventListener('pagehide', () => { try { sessionStorage.setItem(scrollKey, String(window.scrollY)); } catch (_) {} });
+  document.addEventListener('click', ev => {
+    const a = ev.target.closest('a[href]');
+    if (!a || a.hasAttribute('data-logout') || a.getAttribute('href') === '#' || a.target === '_blank') return;
+    const url = new URL(a.href, location.href);
+    if (url.origin === location.origin && !/^(mailto:|tel:)/i.test(a.getAttribute('href') || '')) {
+      try { sessionStorage.setItem('gpNextScroll', String(window.scrollY)); } catch (_) {}
+    }
+  }, true);
   const homeByRole = { admin: 'admin-dashboard.html', agent: 'agent-dashboard.html', customer: 'user-dashboard.html' };
   const allowedByRole = {
     admin: null,
-    agent: ['agent-dashboard.html','dashboard.html','tickets.html','add-ticket.html','ticket-detail.html','customers.html','customer-detail.html','projects.html','contracts.html','support-plans.html','service-catalog.html','contacts.html','assets.html','asset-detail.html','role-agent.html'],
-    customer: ['user-dashboard.html','my-tickets.html','user-create-ticket.html','user-ticket-detail.html','user-service-catalog.html','user-assets.html','role-user.html']
+    agent: ['agent-dashboard.html','dashboard.html','tickets.html','add-ticket.html','ticket-detail.html','customers.html','customer-detail.html','projects.html','contracts.html','support-plans.html','service-catalog.html','contacts.html','assets.html','asset-detail.html','email-notifications.html','change-password.html'],
+    customer: ['user-dashboard.html','my-tickets.html','user-create-ticket.html','user-ticket-detail.html','user-service-catalog.html','user-assets.html','email-notifications.html','change-password.html']
   };
   const pageResource = {
     'tickets.html':'tickets','my-tickets.html':'tickets','dashboard.html':'tickets',
@@ -17,19 +28,19 @@
     'support-plans.html':'plans','service-catalog.html':'services','user-service-catalog.html':'services',
     'teams.html':'teams','users.html':'users','assets.html':'assets','user-assets.html':'assets','audit-log.html':'audit-logs'
   };
-  const customerEntityConfig = {resource:'customers', redirect:'customers.html', map:{'full name':'customer_name','email':'email','phone':'phone','address':'address','primary contact':'contact_name','notes':'notes'}};
+  const customerEntityConfig = {resource:'customers', redirect:'customers.html', map:{'company name':'customer_name','initial contact name':'contact_name','general email':'email','phone':'phone','address':'address'}};
   const customerEditConfig = customerEntityConfig;
   const formConfig = {
     'add-asset.html': {resource:'assets', redirect:'assets.html', map:{'customer':'customer_id','project':'project_id','asset tag':'asset_tag','asset name':'asset_name','type':'type','asset status':'status','vendor':'vendor','model':'model','serial number':'serial_no','ip address':'ip_address','note':'note'}},
     'add-contact.html': {resource:'contacts', redirect:'contacts.html', map:{'customer':'customer_id','contact no':'contact_code','full name':'fullname','department':'department','job title':'job_title','email':'email','phone':'phone','type':'type','notes':'note'}},
     'add-contract.html': {resource:'contracts', redirect:'contracts.html', map:{'customer':'customer_id','project':'project_id','contract no':'contract_code','contract name':'contract_name','support plan':'plan_id','start date':'start_date','end date':'end_date','scope / covered service':'scope'}},
-    'add-customer.html': {resource:'users', redirect:'users.html', map:{'full name':'fullname','email':'email','password':'password','role':'role','support team':'team_id','notes':'notes'}},
+    'add-user.html': {resource:'users', redirect:'users.html', map:{'full name':'fullname','email':'email','password':'password','role':'role','support team':'team_id','notes':'notes'}},
     'add-project.html': {resource:'projects', redirect:'projects.html', map:{'customer':'customer_id','project code':'project_code','project name':'project_name','project manager':'project_manager','project status':'status','start date':'start_date','end date':'end_date','description':'description'}},
     'add-service.html': {resource:'services', redirect:'service-catalog.html', map:{'code':'code_id','name':'name','category':'category','sort order':'request_order','customer visible':'customer_visible','asset requirements':'asset_requirement','mapped team':'mapped_team','auto assign':'auto_assign','assignment method':'assignment_method','description':'description'}},
     'add-request-type.html': {resource:'services', redirect:'service-catalog.html', map:{'code':'code_id','name':'name','category':'category','sort order':'request_order','customer visible':'customer_visible','asset requirements':'asset_requirement','mapped team':'mapped_team','auto assign':'auto_assign','assignment method':'assignment_method','description':'description'}},
     'add-support-plan.html': {resource:'plans', redirect:'support-plans.html', map:{'plan code':'plan_code','plan name':'plan_name','response sla':'response_sla','resolution sla':'resolution_sla','response warning %':'response_warning','response critical %':'response_critical','resolution warning %':'resolution_warning','resolution critical %':'resolution_critical','sla calendar mode':'sla_mode','time zone':'time_zone','business start':'business_start_hour','business end':'business_end_hour','working days':'working_days','escalation level':'escalation_level','remote support':'remote_support','onsite support':'onsite_support','description':'description'}},
     'add-team.html': {resource:'teams', redirect:'teams.html', map:{'team code':'team_code','team name':'team_name','team members':'member','service catalog':'service_codes','description':'description'}},
-    'add-ticket.html': {resource:'tickets', redirect:'tickets.html', map:{'ticket':'customer_id','customer/project':'project_id','contract / plan':'contract_id','request type':'type','subject':'subject','status':'status','asset':'asset_id','assigned':'assigned','created':'date'}},
+    'add-ticket.html': {resource:'tickets', redirect:'tickets.html', map:{'ticket':'customer_id','customer/project':'project_id','contact':'contact_id','contract / plan':'contract_id','request type':'type','subject':'subject','description':'description','status':'status','priority':'priority','asset':'asset_id','assigned':'assigned','created':'date','due date':'due_date','attachment reference':'attachment_reference'}},
     'user-create-ticket.html': {resource:'tickets', redirect:'my-tickets.html', map:{'service':'service_code','request type':'type','subject':'subject','description':'description','related asset (optional)':'asset_id','attachment reference (optional)':'attachment_reference'}},
     'ticket-detail.html': {resource:'tickets', redirect:'tickets.html', map:{'status':'status','priority':'priority','assigned to':'assigned','due date':'due_date'}, alwaysUpdate:true},
   };
@@ -42,6 +53,7 @@
 
   const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
   const labelKey = label => (label || '').replace(/\*/g,'').replace(/\s+/g,' ').trim().toLowerCase();
+  const eventRuleKey = label => { const k=labelKey(label).replace(/ /g,'_'); return k==='new_comment_or_reply' ? 'new_reply' : k; };
   const normalStatus = value => String(value || '').trim().toLowerCase().replace(/[_-]/g,' ');
   const fmtDate = value => {
     if (!value) return '—';
@@ -69,6 +81,28 @@
     box.style.borderColor = type==='error' ? '#efc5cb' : '#bfe8d7';
     box.textContent = message; box.style.display='block';
     clearTimeout(box._hideTimer); box._hideTimer = setTimeout(()=>{box.style.display='none';},5000);
+  }
+  function confirmDialog(message, title='Please confirm') {
+    return new Promise(resolve => {
+      let dialog=document.getElementById('gp-confirm-dialog');
+      if(!dialog){
+        dialog=document.createElement('dialog');
+        dialog.id='gp-confirm-dialog';
+        dialog.className='gp-confirm-dialog';
+        dialog.innerHTML='<div class="gp-confirm-content"><div class="gp-confirm-icon">?</div><h2 data-confirm-title></h2><p data-confirm-message></p><div class="gp-confirm-actions"><button type="button" class="btn" data-confirm-cancel>Cancel</button><button type="button" class="btn btn-primary" data-confirm-ok>OK</button></div></div>';
+        document.body.appendChild(dialog);
+      }
+      dialog.querySelector('[data-confirm-title]').textContent=title;
+      dialog.querySelector('[data-confirm-message]').textContent=message;
+      const ok=dialog.querySelector('[data-confirm-ok]');
+      const cancel=dialog.querySelector('[data-confirm-cancel]');
+      let settled=false;
+      const finish=value=>{if(settled)return;settled=true;dialog.close?.();dialog.removeAttribute('open');ok.removeEventListener('click',onOk);cancel.removeEventListener('click',onCancel);dialog.removeEventListener('cancel',onNativeCancel);resolve(value);};
+      const onOk=()=>finish(true),onCancel=()=>finish(false),onNativeCancel=ev=>{ev.preventDefault();finish(false);};
+      ok.addEventListener('click',onOk);cancel.addEventListener('click',onCancel);dialog.addEventListener('cancel',onNativeCancel);
+      if(typeof dialog.showModal==='function')dialog.showModal();else dialog.setAttribute('open','open');
+      cancel.focus();
+    });
   }
   async function api(url, options={}) {
     const opts = {...options, credentials:'same-origin', headers:{...(options.body ? {'Content-Type':'application/json'} : {}), ...(options.headers||{})}};
@@ -102,20 +136,30 @@
       if(button){button.disabled=true;button.textContent='Signing in…';}
       try {
         const user=await api('/api/auth/login',{method:'POST',body:JSON.stringify({username:document.getElementById('username').value.trim(),password:document.getElementById('password').value,role:document.getElementById('role').value.toLowerCase()})});
-        setSession(user); location.href=user.home;
+        setSession(user); location.href=user.must_change_password ? 'change-password.html' : user.home;
       } catch(e) {
         errorBox.textContent=e.message || 'The username or password is incorrect.'; errorBox.classList.add('show');
       } finally {if(button){button.disabled=false;button.textContent='Sign in →';}}
     });
     // A valid server-side session can go directly to its role dashboard.
-    try { const user=await api('/api/auth/me'); setSession(user); location.replace(homeByRole[user.role] || 'login.html'); }
+    try { const user=await api('/api/auth/me'); setSession(user); location.replace(user.must_change_password ? 'change-password.html' : (homeByRole[user.role] || 'login.html')); }
     catch (_) { clearSession(); }
   }
   function profileAndGuard() {
     const role=currentUser.role, page=file;
+    // The old per-role permission dashboards are intentionally removed from the user-facing product.
+    if (['role-user.html','role-agent.html'].includes(page)) {
+      location.replace(homeByRole[role] || 'login.html'); return false;
+    }
+    document.querySelectorAll('a[href="role-user.html"],a[href="role-agent.html"]').forEach(a=>a.remove());
+    document.querySelectorAll('.item').forEach(item=>{if(/my permissions|view your permission details/i.test(item.textContent)) item.remove();});
+    document.querySelectorAll('a,button').forEach(el=>{if(/my permissions/i.test(el.textContent||'')) el.remove();});
+    if (currentUser.must_change_password && page !== 'change-password.html') { location.replace('change-password.html'); return false; }
     if (allowedByRole[role] && !allowedByRole[role].includes(page)) {
       location.replace(`${homeByRole[role]}?denied=${encodeURIComponent(page)}`); return false;
     }
+    configureRoleNavigation(role);
+    ensureSidebarProfile();
     document.querySelectorAll('[data-customer-name]').forEach(el=>{if(el.matches('input,textarea')) el.value=currentUser.fullname; else el.textContent=currentUser.fullname;});
     document.querySelectorAll('[data-customer-email]').forEach(el=>{if(el.matches('input,textarea')) el.value=currentUser.email; else el.textContent=currentUser.email;});
     document.querySelectorAll('[data-customer-avatar]').forEach(el=>el.textContent=currentUser.fullname.split(/\s+/).map(x=>x[0]).join('').slice(0,2).toUpperCase());
@@ -125,15 +169,70 @@
       const strong=profile.querySelector('strong'); if(strong) strong.textContent=currentUser.fullname;
       const small=profile.querySelector('small'); if(small) small.textContent=currentUser.email;
     }
-    document.querySelectorAll('[data-logout]').forEach(el=>el.addEventListener('click',async ev=>{ev.preventDefault();try{await api('/api/auth/logout',{method:'POST'});}catch(_){}clearSession();location.href='login.html';}));
+    if(!document.body.dataset.logoutHandlerInstalled){
+      document.body.dataset.logoutHandlerInstalled='1';
+      document.addEventListener('click',async ev=>{const el=ev.target.closest('[data-logout]');if(!el)return;ev.preventDefault();try{await api('/api/auth/logout',{method:'POST'});}catch(_){}clearSession();location.href='login.html';});
+    }
     document.querySelectorAll('a[href="dashboard.html"]').forEach(a=>a.setAttribute('href',homeByRole[role]||'dashboard.html'));
     const denied=params.get('denied');
     if(denied){const box=document.getElementById('access-notice');if(box){box.className='access-callout';box.textContent=`Access restricted: your ${role} role does not have permission to open ${denied}.`;}}
     return true;
   }
+  function configureRoleNavigation(role) {
+    const nav=document.querySelector('.sidebar .nav');
+    if(!nav || role==='admin') {
+      document.querySelectorAll('a[href="role-user.html"],a[href="role-agent.html"]').forEach(a=>a.remove());
+      return;
+    }
+    const agentLinks=[
+      ['agent-dashboard.html','▦','Dashboard'],['tickets.html','▤','Tickets'],['customers.html','♙','Customers'],
+      ['projects.html','◈','Projects'],['contracts.html','▣','Contracts'],['support-plans.html','◇','Support Plans'],
+      ['service-catalog.html','☷','Service Catalog'],['contacts.html','♧','Contacts'],['assets.html','▧','Assets'],['email-notifications.html','✉','Email Notifications']
+    ];
+    const customerLinks=[
+      ['user-dashboard.html','▦','Dashboard'],['my-tickets.html','▤','My Tickets'],
+      ['user-create-ticket.html','＋','Create Ticket'],['user-service-catalog.html','☷','Service Catalog'],['user-assets.html','▧','My Assets'],['email-notifications.html','✉','Email Notifications']
+    ];
+    const links=role==='customer'?customerLinks:agentLinks;
+    nav.replaceChildren();
+    links.forEach(([href,icon,label])=>{
+      const a=document.createElement('a');a.href=href;
+      const target=href.toLowerCase();
+      const aliases={
+        'tickets.html':['add-ticket.html','ticket-detail.html'],
+        'customers.html':['add-customer.html','customer-detail.html'],
+        'service-catalog.html':['add-service.html','add-request-type.html'],
+        'user-create-ticket.html':['user-create-ticket.html'],
+        'my-tickets.html':['user-ticket-detail.html'],
+        'user-dashboard.html':['dashboard.html'],
+        'agent-dashboard.html':['dashboard.html']
+      };
+      if(target===file || (aliases[target]||[]).includes(file) || (file==='dashboard.html' && target===homeByRole[role]))a.className='active';
+      const i=document.createElement('span');i.className='nav-icon';i.textContent=icon;
+      const name=document.createElement('span');name.textContent=label;
+      a.append(i,name);nav.appendChild(a);
+    });
+  }
+  function ensureSidebarProfile() {
+    const sidebar=document.querySelector('.sidebar');if(!sidebar)return;
+    let profile=sidebar.querySelector('.sidebar-bottom');
+    if(!profile){profile=document.createElement('div');profile.className='sidebar-bottom';sidebar.appendChild(profile);}
+    if(!profile.querySelector('[data-logout]')){
+      const identity=document.createElement('div');
+      const name=document.createElement('strong');name.dataset.customerName='';name.textContent='Signed-in user';
+      const email=document.createElement('small');email.dataset.customerEmail='';email.textContent='';
+      const logout=document.createElement('a');logout.href='login.html';logout.dataset.logout='';logout.className='logout-link';logout.textContent='Sign out ↗';
+      identity.append(name,email,logout);
+      if(!profile.querySelector('.avatar')){const avatar=document.createElement('div');avatar.className='avatar';avatar.dataset.customerAvatar='';avatar.textContent='GP';profile.appendChild(avatar);}
+      profile.appendChild(identity);
+    }
+  }
+
   async function loadLookups() {
     try { lookupData=await api('/api/lookups'); }
     catch (_) { lookupData={}; }
+    const teamList=document.getElementById('support-team-options');
+    if(teamList){teamList.replaceChildren();(lookupData.teams||[]).forEach(team=>{const opt=document.createElement('option');opt.value=team.team_name;teamList.appendChild(opt);});}
   }
   function optionRows(select, rows, valueKey, labelFn, placeholder) {
     const old=select.value;
@@ -158,6 +257,7 @@
       else if(label==='asset' || label==='related asset (optional)') optionRows(select,lookupData.assets,'asset_id',r=>`${r.asset_tag} · ${r.asset_name}`, label.startsWith('related')?'None':'No asset linked');
       else if(label==='mapped team') optionRows(select,lookupData.teams,'team_name',r=>r.team_name,'Select team');
       else if(label==='service catalog') optionRows(select,lookupData.services,'code_id',r=>r.name,'Select service');
+      else if(label==='contact') optionRows(select,lookupData.contacts,'contact_id',r=>`${r.fullname}${r.customer_name?' · '+r.customer_name:''}`,'Select contact');
       else if(label==='team members') optionRows(select,(lookupData.users||[]).filter(u=>u.role==='agent'),'fullname',r=>r.fullname,'Select team members');
       else if(label==='service' && file==='user-create-ticket.html') optionRows(select,lookupData.services,'code_id',r=>r.name,'Select service');
       else if(label==='request type' && file==='add-ticket.html') optionRows(select,lookupData.services,'name',r=>r.name,'Select request type');
@@ -195,6 +295,11 @@
         if(typeof value==='string') value=['yes','true','enabled','1','on'].includes(value.toLowerCase());
       }
       if(key==='member' && Array.isArray(value)) value=value.join(', ');
+      if(page==='add-user.html' && key==='team_id'){
+        const team=(lookupData.teams||[]).find(t=>String(t.team_id)===String(value)||String(t.team_name).toLowerCase()===String(value||'').trim().toLowerCase());
+        if(value && !team) throw new Error('Choose a Support Team from the available team names.');
+        value=team?team.team_id:null;
+      }
       if(key==='service_codes') {
         payload.service_codes=Array.isArray(value)?value:(value?[value]:[]);
         if(payload.service_codes.length) payload.code_id=payload.service_codes[0];
@@ -239,7 +344,8 @@
         const vals=(Array.isArray(value)?value:String(value).split(',')).map(x=>String(x).trim());
         [...select.options].forEach(o=>o.selected=vals.includes(o.value)||vals.includes(o.textContent.trim()));
       } else {
-        const match=[...select.options].find(o=>String(o.value)===String(value)) || [...select.options].find(o=>o.textContent.trim().toLowerCase()===String(value).toLowerCase());
+        let match=[...select.options].find(o=>String(o.value)===String(value)) || [...select.options].find(o=>o.textContent.trim().toLowerCase()===String(value).toLowerCase());
+        if(!match && String(value).trim()) { match=document.createElement('option'); match.value=String(value); match.textContent=String(value); select.appendChild(match); }
         if(match) select.value=match.value;
       }
       return;
@@ -261,17 +367,18 @@
       if(!key) return;
       let value=row[key];
       if(file==='add-contract.html' && label==='support plan') value=row.plan_id;
+      if(file==='add-user.html' && label==='support team') value=row.team_name || '';
       if(file==='add-team.html' && label==='service catalog') value=row.service_code_ids || (row.code_id?[row.code_id]:[]);
       if(file==='add-team.html' && label==='team members') value=row.member || '';
       setField(field,value,file,label);
     });
-    if(page==='add-customer.html' && !customerEntityMode) {
+    if(file==='add-user.html') {
       const passwordField=[...form.querySelectorAll('.field')].find(field=>labelForField(field)==='password');
       const passwordInput=passwordField?.querySelector('input');
       if(passwordInput){passwordInput.required=false;passwordInput.placeholder='Leave blank to keep current password';}
     }
     const submit=form.querySelector('button[type="submit"]'); if(submit) submit.textContent=submit.textContent.replace(/Create|Save|Submit/i,'Update');
-    const title=document.querySelector('h1'); if(title && !title.textContent.toLowerCase().includes('edit')) title.textContent=`Edit ${title.textContent.trim()}`;
+    const title=document.querySelector('h1'); if(title && !title.textContent.toLowerCase().includes('edit')) title.textContent=(file==='add-ticket.html'?'Edit ticket':`Edit ${title.textContent.trim()}`);
   }
   function actionLink(url,label,cls='btn btn-sm') { return `<a class="${cls}" href="${url}">${esc(label)}</a>`; }
   function rowActions(resource, id, editHref, viewHref=null, viewLabel='View') {
@@ -293,7 +400,7 @@
       if(h.includes('asset')) return esc(row.asset_tag || '—');
       if(h.includes('assigned')) return esc(row.assigned || 'Unassigned');
       if(h.includes('created') || h.includes('last updated') || h.includes('updated')) return fmtDate(h.includes('updated') && !h.includes('created') ? row.updated_at : row.date);
-      if(h==='action' || h==='actions') return rowActions('tickets',row.ticket_id,null,ticketHref(row),'View');
+      if(h==='action' || h==='actions') return currentUser.role==='admin' ? `${actionLink(ticketHref(row),'View')} ${actionLink(`add-ticket.html?id=${encodeURIComponent(row.ticket_id)}`,'Edit')} <button type="button" class="btn btn-sm" data-delete-resource="tickets" data-delete-id="${esc(row.ticket_id)}" style="color:#b12c44">Delete</button>` : rowActions('tickets',row.ticket_id,null,ticketHref(row),'View');
     }
     if(resource==='projects') {
       if(h.includes('customer')) return esc(row.customer_name);
@@ -336,8 +443,9 @@
       if(h.includes('action')) return rowActions('contracts',row.contract_id,`add-contract.html?id=${row.contract_id}`,null);
     }
     if(resource==='plans') {
-      const mappings=[['plan code',row.plan_code || ('PLAN-'+row.plan_id)],['plan name',row.plan_name],['response sla',row.response_sla],['rsponse sla',row.response_sla],['resolution sla',row.resolution_sla],['reslution sla',row.resolution_sla],['response warning',row.response_warning],['reslution warning',row.resolution_warning],['response critical',row.response_critical],['reslution critical',row.resolution_critical],['calendar mode',row.sla_mode],['calender mode',row.sla_mode],['time zone',row.time_zone],['business start',row.business_start_hour],['business end',row.business_end_hour],['working days',row.working_days],['escalation level',row.escalation_level],['remote support',row.remote_support],['on-site support',row.onsite_support],['actions',rowActions('plans',row.plan_id,`add-support-plan.html?id=${row.plan_id}`,null)]];
-      const found=mappings.find(([key])=>h.includes(key)); if(found) return typeof found[1]==='string' && found[1].startsWith('<a ') ? found[1] : esc(found[1] ?? '—');
+      if(h.includes('action')) return rowActions('plans',row.plan_id,`add-support-plan.html?id=${row.plan_id}`,null);
+      const mappings=[['plan code',row.plan_code || ('PLAN-'+row.plan_id)],['plan name',row.plan_name],['response sla',row.response_sla],['rsponse sla',row.response_sla],['resolution sla',row.resolution_sla],['reslution sla',row.resolution_sla],['response warning',row.response_warning],['reslution warning',row.resolution_warning],['response critical',row.response_critical],['reslution critical',row.resolution_critical],['calendar mode',row.sla_mode],['calender mode',row.sla_mode],['time zone',row.time_zone],['business start',row.business_start_hour],['business end',row.business_end_hour],['working days',row.working_days],['escalation level',row.escalation_level],['remote support',row.remote_support],['on-site support',row.onsite_support]];
+      const found=mappings.find(([key])=>h.includes(key)); if(found) return esc(found[1] ?? '—');
     }
     if(resource==='services') {
       if(h==='code') return esc(row.code_id);
@@ -348,7 +456,7 @@
       if(h.includes('asset requirement')) return esc(row.asset_requirement || '—');
       if(h.includes('mapped team')) return esc(row.mapped_team || '—');
       if(h.includes('auto assign')) return badge(row.auto_assign?'Enabled':'Disabled');
-      if(h.includes('assignment method')) return esc(row.assignment_method || '—');
+      if(h.includes('assignment method') || h.includes('assigenment method') || h.includes('assignement method')) return esc(row.assignment_method || '—');
       if(h.includes('action')) return rowActions('services',row.code_id,`add-service.html?id=${encodeURIComponent(row.code_id)}`,null);
     }
     if(resource==='teams') {
@@ -378,16 +486,17 @@
       if(h==='password') return '••••••••';
       if(h==='role') return badge(row.role);
       if(h.includes('support team')) return esc(row.team_name || '—');
-      if(h.includes('action')) return rowActions('users',row.user_id,`add-customer.html?id=${row.user_id}`,null);
+      if(h.includes('action')) return `${rowActions('users',row.user_id,`add-user.html?id=${row.user_id}`,null)} ${row.role==='customer'?`<button type="button" class="btn btn-sm" data-reset-customer-password="${esc(row.user_id)}">Reset password</button>`:''}`;
     }
     if(resource==='audit-logs') {
-      if(h.includes('timestamp')) return esc(row.created_at ? new Date(row.created_at).toLocaleString() : '—');
-      if(h==='customer' || h==='user' || h==='user name') return esc(row.user_name || 'System');
-      if(h==='action') return esc(row.action);
-      if(h==='module') return esc(row.module);
-      if(h==='record') return esc(row.details || '—');
-      if(h.includes('ip address')) return '—';
-      if(h==='result') return badge(row.action==='LOGIN_FAILED'?'Failed':'Success');
+      if(h.includes('timestamp') || h==='date') return `<span class="audit-date">${esc(row.created_at ? new Date(row.created_at).toLocaleString() : '—')}</span>`;
+      if(h==='customer' || h==='user' || h==='user name') return `<div class="audit-user"><strong>${esc(row.user_name || 'System')}</strong><span class="sub-cell">${esc(row.actor_role || 'system')}</span></div>`;
+      if(h==='action') return `<span class="audit-action-pill">${esc(row.action || '—')}</span>`;
+      if(h==='module' || h==='entity') return `<div class="audit-entity">${esc(row.module || '—')}<span class="sub-cell">${esc(row.entity_label || row.entity_id || '')}</span></div>`;
+      if(h==='record' || h==='summary' || h.includes('summary')) return `<div class="audit-summary">${esc(row.details || '—')}</div>`;
+      if(h==='ip' || h.includes('ip address')) return esc(row.ip_address || '—');
+      if(h==='result') return badge(row.action==='LOGIN_FAILED'||row.action==='EMAIL_FAILED'||row.action==='PASSWORD_RESET_EMAIL_FAILED'?'Failed':row.action==='EMAIL_SKIPPED'?'Skipped':'Success');
+      if(h==='details' || h==='details / changes') return `<button type="button" class="btn btn-sm" data-audit-view="${esc(row.audit_id)}">${row.changes && Object.keys(row.changes).length?'View Changes':'View Details'}</button>`;
     }
     return '—';
   }
@@ -400,7 +509,16 @@
     if(!rows.length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=headers.length;td.className='empty-data';td.textContent='No records found in the database yet.';td.style.padding='22px';td.style.textAlign='center';td.style.color='#7b8497';tr.appendChild(td);tbody.appendChild(tr);return;}
     rows.forEach(row=>{
       const tr=document.createElement('tr');
-      headers.forEach(header=>{const td=document.createElement('td');td.innerHTML=cellFor(resource,row,header,page);tr.appendChild(td);});
+      headers.forEach(header=>{
+        const td=document.createElement('td');
+        const normalized=header.toLowerCase().replace(/\s+/g,' ').trim();
+        if(resource==='plans' && normalized.includes('action') && currentUser?.role==='admin'){
+          const edit=document.createElement('a');edit.className='btn btn-sm';edit.href=`add-support-plan.html?id=${encodeURIComponent(row.plan_id)}`;edit.textContent='Edit';
+          const del=document.createElement('button');del.type='button';del.className='btn btn-sm';del.dataset.deleteResource='plans';del.dataset.deleteId=String(row.plan_id);del.style.color='#b12c44';del.style.marginLeft='6px';del.textContent='Delete';
+          td.append(edit,del);
+        } else td.innerHTML=cellFor(resource,row,header,page);
+        tr.appendChild(td);
+      });
       tbody.appendChild(tr);
     });
     const foot=table.closest('.card')?.querySelector('.table-foot');
@@ -408,7 +526,7 @@
   }
   function chooseTable(resource) {
     const tables=[...document.querySelectorAll('table')];
-    return tables.find(t=>{const text=t.querySelector('thead')?.textContent.toLowerCase()||'';return resource==='tickets'?text.includes('ticket'):resource==='assets'?text.includes('asset'):resource==='services'?text.includes('code')||text.includes('service'):resource==='audit-logs'?text.includes('timestamp'):resource==='users'?text.includes('fullname'):resource==='projects'?text.includes('project code'):resource==='customers'?text.includes('company'):resource==='contacts'?text.includes('contact no'):resource==='contracts'?text.includes('contract no'):resource==='plans'?text.includes('plan code'):resource==='teams'?text.includes('team code'):false;}) || tables[0];
+    return tables.find(t=>{const text=t.querySelector('thead')?.textContent.toLowerCase()||'';return resource==='tickets'?text.includes('ticket'):resource==='assets'?text.includes('asset'):resource==='services'?text.includes('code')||text.includes('service'):resource==='audit-logs'?(text.includes('timestamp')||(text.includes('date')&&text.includes('user'))):resource==='users'?text.includes('fullname'):resource==='projects'?text.includes('project code'):resource==='customers'?text.includes('company'):resource==='contacts'?text.includes('contact no'):resource==='contracts'?text.includes('contract no'):resource==='plans'?text.includes('plan code'):resource==='teams'?text.includes('team code'):false;}) || tables[0];
   }
   async function loadList(resource=pageResource[file]) {
     if(!resource) return;
@@ -466,6 +584,16 @@
         try{await api(`/api/${encodeURIComponent(resource)}/${encodeURIComponent(id)}`,{method:'DELETE'});toast('Record deleted.');await loadList(resource);}
         catch(e){toast(e.message,'error');button.disabled=false;}
       });
+      document.addEventListener('click',async ev=>{
+        const button=ev.target.closest('[data-reset-customer-password]');if(!button)return;
+        const id=button.dataset.resetCustomerPassword;
+        const confirmed=await confirmDialog('Reset this customer password and email a temporary password to their registered email address?','Reset customer password');
+        if(!confirmed)return;
+        button.disabled=true;
+        try{const result=await api(`/api/users/${encodeURIComponent(id)}/reset-password`,{method:'POST'});toast(result.message);}
+        catch(e){toast(e.message,'error');}
+        finally{button.disabled=false;}
+      });
     }
     document.querySelectorAll('form.compact-search').forEach(form=>form.addEventListener('submit',ev=>{
       const input=form.querySelector('input[type="search"]');if(!input)return;
@@ -486,16 +614,29 @@
       const resource=pageResource[file];
       if(searchButton && resource) searchButton.addEventListener('click',ev=>{
         ev.preventDefault();const rows=loadedRows[resource]||[];
-        const values=[...panel.querySelectorAll('.filter-grid input,.filter-grid select')].map(x=>x.value.trim().toLowerCase()).filter(Boolean).filter(v=>!/^all\s/i.test(v));
-        const filtered=rows.filter(r=>values.every(v=>JSON.stringify(r).toLowerCase().includes(v)));
+        let filtered=rows;
+        if(file==='audit-log.html'){
+          const fields=[...panel.querySelectorAll('.filter-grid .field')];
+          const valueAt=i=>fields[i]?.querySelector('input,select')?.value?.trim()||'';
+          const query=valueAt(0).toLowerCase(), module=valueAt(1).toLowerCase(), from=valueAt(2), to=valueAt(3);
+          filtered=rows.filter(r=>{
+            const searchable=`${r.user_name||''} ${r.action||''} ${r.module||''} ${r.details||''}`.toLowerCase();
+            const day=String(r.created_at||r.timestamp||'').slice(0,10);
+            return (!query||searchable.includes(query))&&(!module||/^all\s/i.test(module)||String(r.module||'').toLowerCase()===module)&&(!from||day>=from)&&(!to||day<=to);
+          });
+        } else {
+          const values=[...panel.querySelectorAll('.filter-grid input,.filter-grid select')].map(x=>x.value.trim().toLowerCase()).filter(Boolean).filter(v=>!/^all\s/i.test(v));
+          filtered=rows.filter(r=>values.every(v=>JSON.stringify(r).toLowerCase().includes(v)));
+        }
         const table=chooseTable(resource);if(table)renderTable(resource,filtered,table,file);
       });
       const reset=[...panel.querySelectorAll('a')].find(a=>/^reset$/i.test(a.textContent.trim()));
       if(reset && resource) reset.addEventListener('click',ev=>{ev.preventDefault();panel.querySelectorAll('input,select').forEach(el=>{if(el.tagName==='SELECT')el.selectedIndex=0;else el.value='';});const table=chooseTable(resource);if(table)renderTable(resource,loadedRows[resource]||[],table,file);});
     });
     document.querySelectorAll('a[href="#"]').forEach(a=>{
-      if(/export csv/i.test(a.textContent)) a.addEventListener('click',ev=>{ev.preventDefault();const resource=pageResource[file],rows=loadedRows[resource]||[];exportCsv(resource,rows);});
+      if(/export csv|^export$|export log/i.test(a.textContent.trim())) a.addEventListener('click',ev=>{ev.preventDefault();const resource=pageResource[file],rows=loadedRows[resource]||[];exportCsv(resource,rows);});
     });
+    if(file==='audit-log.html') document.querySelectorAll('a').forEach(a=>{if(/export log/i.test(a.textContent)&&a.getAttribute('href')!=='#')a.addEventListener('click',ev=>{ev.preventDefault();exportCsv('audit-logs',loadedRows['audit-logs']||[]);});});
   }
   function exportCsv(resource, rows) {
     if(!rows.length){toast('There are no records to export.','error');return;}
@@ -512,11 +653,21 @@
       ev.preventDefault();
       try {
         const payload=payloadForForm(file,form,cfg);
-        if(file==='add-customer.html' && !customerEntityMode) {
+        if(file==='add-user.html') {
           const role=String(payload.role||'customer').toLowerCase();payload.role=role==='administrator'?'admin':role;
           if(!payload.password && !id) throw new Error('Enter a temporary password for this account.');
+          if(!payload.team_id) throw new Error('Select a valid Support Team from the available team names.');
         }
         if(file==='add-project.html' && !payload.customer_id) throw new Error('Select a customer for this project.');
+        if(file==='add-customer.html' && !payload.customer_name) throw new Error('Enter the company name.');
+        if(file==='add-ticket.html') {
+          if(!payload.customer_id) throw new Error('Select a customer.');
+          if(!payload.subject) throw new Error('Enter a ticket subject.');
+          const service=(lookupData.services||[]).find(x=>String(x.name)===String(payload.type)||String(x.code_id)===String(payload.type));
+          if(service) payload.service_code=service.code_id;
+          const contract=(lookupData.contracts||[]).find(x=>String(x.contract_id)===String(payload.contract_id));
+          if(contract && contract.plan_id) payload.plan_id=contract.plan_id;
+        }
         if(file==='add-contact.html' && !payload.customer_id) throw new Error('Select the contact’s customer.');
         if(file==='add-contract.html' && !payload.customer_id) throw new Error('Select a customer for this contract.');
         if(file==='add-asset.html' && !payload.asset_tag) throw new Error('Enter an asset tag.');
@@ -524,7 +675,8 @@
         const shouldUpdate=Boolean(id);
         const result=await api(shouldUpdate?`/api/${cfg.resource}/${encodeURIComponent(id)}`:`/api/${cfg.resource}`,{method:shouldUpdate?'PUT':'POST',body:JSON.stringify(payload)});
         toast(shouldUpdate?'Record updated successfully.':'Record created successfully.');
-        if(file==='add-customer.html' && !customerEntityMode && result.role) location.href='users.html';
+        if(file==='add-user.html') location.href='users.html';
+        else if(file==='add-ticket.html' && shouldUpdate) location.href=`ticket-detail.html?id=${encodeURIComponent(id)}`;
         else location.href=cfg.redirect;
       } catch(e){toast(e.message || 'Unable to save the record.','error');}
     });
@@ -541,7 +693,22 @@
       const ticket=await api(`/api/tickets/${encodeURIComponent(idParam)}`);
       document.querySelectorAll('.breadcrumb').forEach(b=>{if(b.textContent.toLowerCase().includes('ticket')) b.innerHTML=`<a href="tickets.html">Tickets</a> / ${esc(ticket.ticket_code)}`;});
       const h1=document.querySelector('main h1');if(h1)h1.textContent=`Ticket ${ticket.ticket_code}`;
-      document.querySelectorAll('h2').forEach(h=>{if(/Database connection|Ticket information|Ticket details/i.test(h.textContent))h.textContent=ticket.subject;});
+      const editLink=[...document.querySelectorAll('a')].find(a=>/edit ticket/i.test(a.textContent));
+      if(editLink){editLink.href=`add-ticket.html?id=${encodeURIComponent(ticket.ticket_id)}`;if(currentUser.role==='customer')editLink.style.display='none';}
+      const pills=document.querySelectorAll('.inline .badge, .inline .code');
+      pills.forEach(el=>{if(/priority/i.test(el.textContent))el.textContent=`${ticket.priority||'Medium'} priority`;else if(/open|closed|resolved|progress|pending/i.test(el.textContent))el.textContent=ticket.status||'Open';else if(el.classList.contains('code'))el.textContent=ticket.ticket_code;});
+      const headings=[...document.querySelectorAll('h2')];
+      headings.forEach(h=>{if(/Database connection|Ticket information|Ticket details/i.test(h.textContent))h.textContent=ticket.subject||'Ticket details';});
+      const headerCard=[...document.querySelectorAll('.card')].find(c=>c.querySelector('h2')?.textContent===(ticket.subject||''));
+      if(headerCard){
+        const meta=headerCard.querySelector('.card-head p');if(meta)meta.textContent=`Created ${fmtDate(ticket.date)}${ticket.updated_at?` · Last updated ${new Date(ticket.updated_at).toLocaleString()}`:''}`;
+        const notice=headerCard.querySelector('.notice');if(notice)notice.textContent=ticket.description||'No description was provided for this ticket.';
+        const fields=[...headerCard.querySelectorAll('.form-grid .field')];
+        const values=[ticket.customer_name,ticket.project_name,ticket.contract_code||ticket.contract_name,ticket.type,ticket.assigned||'Unassigned',ticket.asset_tag];
+        fields.forEach((field,i)=>{const strong=field.querySelector('strong');if(strong&&values[i]!==undefined)strong.textContent=values[i]||'—';});
+      }
+      const sla=[...document.querySelectorAll('.item')].find(item=>/Support plan/i.test(item.textContent));
+      if(sla){const strong=sla.querySelector('strong');if(strong)strong.textContent=ticket.plan_name||'—';}
       if(form){form.querySelectorAll('.field').forEach(field=>{const label=labelForField(field);const key=cfgFieldForTicket(label);if(key)setField(field,ticket[key],file,label);});form.addEventListener('submit',async ev=>{ev.preventDefault();try{const payload=payloadForForm(file,form,formConfig[file]);await api(`/api/tickets/${ticket.ticket_id}`,{method:'PUT',body:JSON.stringify(payload)});toast('Ticket updated.');location.href=`ticket-detail.html?id=${ticket.ticket_id}`;}catch(e){toast(e.message,'error');}});}
     }catch(e){toast(e.message,'error');}
   }
@@ -551,6 +718,22 @@
     const form=getMainForm();if(!form)return;
     if(serviceName){const serviceSelect=[...form.querySelectorAll('.field')].find(f=>labelForField(f)==='service')?.querySelector('select');if(serviceSelect){const option=[...serviceSelect.options].find(o=>o.value===serviceName||o.textContent===serviceName);if(option)serviceSelect.value=option.value;}}
   }
+  async function handleStaffTicketConversation(){
+    const id=idParam;if(!id)return;
+    try{
+      const ticket=await api(`/api/tickets/${encodeURIComponent(id)}`);
+      const activity=[...document.querySelectorAll('section.card')].find(s=>/activity|comments/i.test(s.textContent));
+      if(!activity)return;
+      const body=activity.querySelector('.card-body');if(!body)return;
+      body.innerHTML='<div data-replies></div><form data-staff-reply-form class="staff-reply-form" style="margin-top:16px"><div class="field"><label data-reply-label>Public reply</label><textarea class="textarea" placeholder="Write a reply to the customer" required></textarea></div><div class="reply-mode-wrap"><span class="reply-mode-caption">Message type</span><div class="reply-mode-switch" role="group" aria-label="Choose message type"><button class="reply-mode-option is-selected" type="button" data-reply-mode="public" aria-pressed="true">Public reply</button><button class="reply-mode-option" type="button" data-reply-mode="internal" aria-pressed="false">🔒 Internal note</button></div><p class="reply-mode-hint" data-internal-note-hint>Visible to the customer and staff.</p></div><div class="form-actions"><button class="btn btn-primary" type="submit" data-reply-submit>Send reply</button></div></form>';
+      let replies=await api(`/api/tickets/${ticket.ticket_id}/replies`);renderReplies(replies,ticket);
+      const form=body.querySelector('[data-staff-reply-form]');const textarea=form.querySelector('textarea');const modeButtons=[...form.querySelectorAll('[data-reply-mode]')];let internalMode=false;
+      const updateNoteMode=()=>{form.classList.toggle('is-internal-note',internalMode);modeButtons.forEach(button=>{const selected=button.dataset.replyMode===(internalMode?'internal':'public');button.classList.toggle('is-selected',selected);button.setAttribute('aria-pressed',String(selected));});form.querySelector('[data-reply-label]').textContent=internalMode?'Internal note':'Public reply';textarea.placeholder=internalMode?'Write a private note for Admin and Agent only':'Write a reply to the customer';form.querySelector('[data-internal-note-hint]').textContent=internalMode?'Staff only · Not visible to customers · No customer email':'Visible to the customer and staff';form.querySelector('[data-reply-submit]').textContent=internalMode?'Add internal note':'Send reply';};
+      modeButtons.forEach(button=>button.addEventListener('click',()=>{internalMode=button.dataset.replyMode==='internal';updateNoteMode();}));
+      form.addEventListener('submit',async ev=>{ev.preventDefault();const text=textarea.value.trim();if(!text)return;const internal=internalMode;try{await api(`/api/tickets/${ticket.ticket_id}/replies`,{method:'POST',body:JSON.stringify({body:text,is_internal:internal})});textarea.value='';internalMode=false;updateNoteMode();toast(internal?'Internal note saved for Admin and Agent only.':'Reply sent.');replies=await api(`/api/tickets/${ticket.ticket_id}/replies`);renderReplies(replies,ticket);}catch(e){toast(e.message,'error');}});
+    }catch(e){toast(e.message,'error');}
+  }
+
   async function handleTicketConversation() {
     const id=idParam;
     if(!id){const notice=document.createElement('div');notice.className='notice warning';notice.textContent='Please open this ticket from My Tickets so its ID is included.';document.querySelector('.breadcrumb')?.after(notice);return;}
@@ -559,7 +742,7 @@
       const heading=document.querySelector('main h1');if(heading)heading.textContent=`${ticket.ticket_code} · ${ticket.subject}`;
       document.querySelectorAll('.breadcrumb').forEach(b=>{if(b.textContent.toLowerCase().includes('ticket'))b.innerHTML=`<a href="my-tickets.html">My tickets</a> / ${esc(ticket.ticket_code)}`;});
       let replies=await api(`/api/tickets/${ticket.ticket_id}/replies`);
-      const form=getMainForm();if(form) form.addEventListener('submit',async ev=>{ev.preventDefault();const textarea=form.querySelector('textarea');const body=textarea?.value.trim();if(!body){toast('Write a reply before sending.','error');return;}try{await api(`/api/tickets/${ticket.ticket_id}/replies`,{method:'POST',body:JSON.stringify({body})});textarea.value='';toast('Reply sent.');replies=await api(`/api/tickets/${ticket.ticket_id}/replies`);renderReplies(replies,ticket);}catch(e){toast(e.message,'error');}});
+      const form=getMainForm();if(form) form.addEventListener('submit',async ev=>{ev.preventDefault();const textarea=form.querySelector('textarea');const body=textarea?.value.trim();if(!body){toast('Write a reply before sending.','error');return;}try{await api(`/api/tickets/${ticket.ticket_id}/replies`,{method:'POST',body:JSON.stringify({body,is_internal:false})});textarea.value='';toast('Reply sent.');replies=await api(`/api/tickets/${ticket.ticket_id}/replies`);renderReplies(replies,ticket);}catch(e){toast(e.message,'error');}});
       renderReplies(replies,ticket);
     }catch(e){toast(e.message,'error');}
   }
@@ -567,7 +750,7 @@
     let section=[...document.querySelectorAll('section.card')].find(s=>/conversation|repl|activity/i.test(s.textContent));
     if(!section){const main=document.querySelector('main');if(!main)return;section=document.createElement('section');section.className='card';section.innerHTML='<div class="card-head"><h2>Conversation</h2></div><div class="card-body"><div data-replies></div></div>';const form=getMainForm();if(form)form.closest('section.card')?.before(section);else main.append(section);}
     let host=section.querySelector('[data-replies]');if(!host){host=document.createElement('div');host.dataset.replies='';section.querySelector('.card-body')?.prepend(host);}
-    host.innerHTML=`<div class="item-list">${replies.length?replies.map(r=>`<div class="item" style="align-items:flex-start"><div><strong>${esc(r.user_name)}</strong><small>${esc(new Date(r.created_at).toLocaleString())}</small><p style="margin:8px 0 0;white-space:pre-wrap">${esc(r.body)}</p></div></div>`).join(''):'<p class="subtitle">No replies yet.</p>'}</div>`;
+    host.innerHTML=`<div class="item-list">${replies.length?replies.map(r=>`<div class="item" style="align-items:flex-start"><div><strong>${esc(r.user_name)} ${r.is_internal?'<span class="badge high">Internal note · Staff only</span>':''}</strong><small>${esc(new Date(r.created_at).toLocaleString())}</small><p style="margin:8px 0 0;white-space:pre-wrap">${esc(r.body)}</p></div></div>`).join(''):'<p class="subtitle">No replies yet.</p>'}</div>`;
   }
   async function handleEditDetails() {
     if(!idParam)return;
@@ -592,22 +775,129 @@
     }
   }
   async function handleEmailPage() {
-    if(currentUser.role!=='admin')return;
-    const forms=[...document.querySelectorAll('form')].filter(f=>!f.classList.contains('compact-search'));
-    const settingsForm=forms.find(f=>[...f.querySelectorAll('button')].some(b=>/save mail settings/i.test(b.textContent)));
-    const testForm=forms.find(f=>[...f.querySelectorAll('button')].some(b=>/send test email/i.test(b.textContent)));
-    try {
-      const settings=await api('/api/email-settings');
-      if(settingsForm){settingsForm.querySelectorAll('.field').forEach(field=>{const label=labelForField(field);const keys={'smtp host':'smtp_host','smtp port':'smtp_port','encryption':'encryption','authentication':'authentication','smtp username':'smtp_username','from name':'from_name','from email':'from_email','reply-to email':'reply_to_email','connection timeout (seconds)':'timeout'};const key=keys[label];if(key){const input=field.querySelector('input,select');if(input&&settings[key]!==undefined)input.value=settings[key];}});}
-    } catch(e) { /* Settings may be new; the form stays usable. */ }
-    if(settingsForm)settingsForm.addEventListener('submit',async ev=>{ev.preventDefault();const v={event_rules:{}};settingsForm.querySelectorAll('.field').forEach(field=>{const label=labelForField(field);const keys={'smtp host':'smtp_host','smtp port':'smtp_port','encryption':'encryption','authentication':'authentication','smtp username':'smtp_username','smtp password':'smtp_password','from name':'from_name','from email':'from_email','reply-to email':'reply_to_email','connection timeout (seconds)':'timeout'};const key=keys[label];if(!key)return;const el=field.querySelector('input,select');if(!el)return;v[key]=el.type==='number'?Number(el.value||0):el.value;});
-      document.querySelectorAll('.toggle-row').forEach(row=>{const k=labelKey(row.querySelector('strong')?.textContent||'').replace(/ /g,'_');const checkbox=row.querySelector('input[type="checkbox"]');if(checkbox)v.event_rules[k]=checkbox.checked;});
-      try{await api('/api/email-settings',{method:'PUT',body:JSON.stringify(v)});toast('Email settings saved.');const b=document.querySelector('.card-head .badge');if(b){b.textContent='Settings saved';b.className='badge closed';}}catch(e){toast(e.message,'error');}
-    });
-    if(testForm)testForm.addEventListener('submit',async ev=>{ev.preventDefault();const input=testForm.querySelector('input[type="email"]');try{const res=await api('/api/email-settings/test',{method:'POST',body:JSON.stringify({recipient:input?.value||''})});toast(res.message);}catch(e){toast(e.message,'error');}});
-    const saveRules=[...document.querySelectorAll('button')].find(b=>/save event rules/i.test(b.textContent));
-    if(saveRules)saveRules.addEventListener('click',async ev=>{ev.preventDefault();try{const settings=await api('/api/email-settings');const rules={};document.querySelectorAll('.toggle-row').forEach(row=>{const k=labelKey(row.querySelector('strong')?.textContent||'').replace(/ /g,'_');const checkbox=row.querySelector('input[type="checkbox"]');if(checkbox)rules[k]=checkbox.checked;});settings.event_rules=rules;settings.smtp_password='';await api('/api/email-settings',{method:'PUT',body:JSON.stringify(settings)});toast('Email notification rules saved.');}catch(e){toast(e.message,'error');}});
+    const isAdmin=currentUser.role==='admin';
+    const columns=[...document.querySelectorAll('.two-col > div')];
+    const smtpCard=columns[0]?.querySelector('section.card');
+    const rulesCard=columns[0]?.querySelectorAll('section.card')[1];
+    if(!isAdmin){
+      if(smtpCard)smtpCard.style.display='none';
+      columns[1]?.querySelectorAll('section.card').forEach(card=>card.style.display='none');
+      const title=rulesCard?.querySelector('h2'); if(title)title.textContent='My email notification preferences';
+      const desc=rulesCard?.querySelector('.card-head p'); if(desc)desc.textContent='Choose the email updates you want to receive at your registered email address.';
+      const warning=document.querySelector('.notice'); if(warning)warning.textContent='Your preferences apply to ticket notifications sent to your account. SMTP server settings and system-wide rules are managed by an administrator.';
+      const tabs=document.querySelector('.tabs'); if(tabs)tabs.style.display='none';
+      document.querySelectorAll('.top-actions a[href="email-notifications.html"]').forEach(a=>a.style.display='none');
+      const btn=[...document.querySelectorAll('button')].find(b=>/save event rules/i.test(b.textContent)); if(btn)btn.textContent='Save preferences';
+    }
+    const rulesForm=[...document.querySelectorAll('button')].find(b=>/save (event rules|preferences)/i.test(b.textContent));
+    const toggleRows=[...document.querySelectorAll('.toggle-row')];
+    if(isAdmin){
+      const settingsForm=document.getElementById('email-server-settings-form');
+      const testForm=[...document.querySelectorAll('form')].find(f=>[...f.querySelectorAll('button')].some(b=>/send test email/i.test(b.textContent)));
+      const provider=document.getElementById('smtp-provider');
+      const emailInput=document.getElementById('smtp-email-address');
+      const passwordInput=document.getElementById('smtp-app-password');
+      const fromNameInput=document.getElementById('smtp-from-name');
+      const hostInput=document.getElementById('smtp-host');
+      const portInput=document.getElementById('smtp-port');
+      const encryptionInput=document.getElementById('smtp-encryption');
+      const authInput=document.getElementById('smtp-authentication');
+      const usernameInput=document.getElementById('smtp-username');
+      const fromEmailInput=document.getElementById('smtp-from-email');
+      const replyToInput=document.getElementById('smtp-reply-to');
+      const timeoutInput=document.getElementById('smtp-timeout');
+      const badgeEl=smtpCard?.querySelector('.card-head .badge');
+      function applyProvider(value, force=true){
+        if(value==='gmail'){
+          if(force||!hostInput.value||hostInput.value==='stmp.cmp'){hostInput.value='smtp.gmail.com';portInput.value='587';encryptionInput.value='STARTTLS';authInput.value='Username and password';}
+        }else if(value==='outlook'){
+          if(force||!hostInput.value){hostInput.value='smtp.office365.com';portInput.value='587';encryptionInput.value='STARTTLS';authInput.value='Username and password';}
+        }
+        if(value!=='custom'){
+          if(emailInput.value){usernameInput.value=emailInput.value;fromEmailInput.value=emailInput.value;}
+          const advanced=document.querySelector('.advanced-mail-settings');if(advanced)advanced.open=false;
+        }else{
+          const advanced=document.querySelector('.advanced-mail-settings');if(advanced)advanced.open=true;
+        }
+      }
+      provider?.addEventListener('change',()=>applyProvider(provider.value,true));
+      emailInput?.addEventListener('input',()=>{if(provider.value!=='custom'){usernameInput.value=emailInput.value;fromEmailInput.value=emailInput.value;}});
+      try {
+        const settings=await api('/api/email-settings');
+        const host=String(settings.smtp_host||'').trim().toLowerCase();
+        let providerChoice=host==='smtp.gmail.com'?'gmail':(host==='smtp.office365.com'?'outlook':(host==='stmp.cmp'||!host?'gmail':'custom'));
+        if(provider)provider.value=providerChoice;
+        if(emailInput)emailInput.value=settings.smtp_username||settings.from_email||'';
+        if(passwordInput)passwordInput.value='';
+        if(fromNameInput)fromNameInput.value=settings.from_name||'Golden Pride Support';
+        if(hostInput)hostInput.value=(providerChoice==='gmail'&&host==='stmp.cmp')?'smtp.gmail.com':(settings.smtp_host||'smtp.gmail.com');
+        if(portInput)portInput.value=settings.smtp_port||587;
+        if(encryptionInput)encryptionInput.value=settings.encryption||'STARTTLS';
+        if(authInput)authInput.value=settings.authentication||'Username and password';
+        if(usernameInput)usernameInput.value=settings.smtp_username||settings.from_email||'';
+        if(fromEmailInput)fromEmailInput.value=settings.from_email||settings.smtp_username||'';
+        if(replyToInput)replyToInput.value=settings.reply_to_email||'';
+        if(timeoutInput)timeoutInput.value=settings.timeout||15;
+        if(providerChoice!=='custom'&&host!=='stmp.cmp')applyProvider(providerChoice,false);
+        if(badgeEl){const ready=Boolean(settings.smtp_password_set&&settings.smtp_username&&settings.from_email&&host!=='stmp.cmp');badgeEl.textContent=ready?'Configured':'Setup required';badgeEl.className=`badge ${ready?'closed':'high'}`;}
+      } catch(e){if(badgeEl){badgeEl.textContent='Setup required';badgeEl.className='badge high';}}
+      if(settingsForm)settingsForm.addEventListener('submit',async ev=>{
+        ev.preventDefault();
+        const selected=provider?.value||'gmail';
+        const email=(emailInput?.value||'').trim();
+        if(!email||!email.includes('@')){toast('Enter the email address used to send notifications.','error');emailInput?.focus();return;}
+        const v={event_rules:{},smtp_host:(hostInput?.value||'').trim(),smtp_port:Number(portInput?.value||587),encryption:encryptionInput?.value||'STARTTLS',authentication:authInput?.value||'Username and password',smtp_username:email,from_email:email,from_name:(fromNameInput?.value||'Golden Pride Support').trim(),reply_to_email:(replyToInput?.value||'').trim(),timeout:Number(timeoutInput?.value||15),smtp_password:passwordInput?.value||''};
+        if(selected==='gmail'){v.smtp_host='smtp.gmail.com';v.smtp_port=587;v.encryption='STARTTLS';v.authentication='Username and password';}
+        else if(selected==='outlook'){v.smtp_host='smtp.office365.com';v.smtp_port=587;v.encryption='STARTTLS';v.authentication='Username and password';}
+        else{v.smtp_username=(usernameInput?.value||email).trim();v.from_email=(fromEmailInput?.value||email).trim();}
+        toggleRows.forEach(row=>{const k=eventRuleKey(row.querySelector('strong')?.textContent||'');const checkbox=row.querySelector('input[type="checkbox"]');if(checkbox)v.event_rules[k]=checkbox.checked;});
+        try{
+          const result=await api('/api/email-settings',{method:'PUT',body:JSON.stringify(v)});
+          toast(result.message||'Email settings saved.');
+          if(badgeEl){badgeEl.textContent='Saved · Test email next';badgeEl.className='badge progress';}
+          if(passwordInput)passwordInput.value='';
+        }catch(e){toast(e.message,'error');}
+      });
+      if(testForm)testForm.addEventListener('submit',async ev=>{ev.preventDefault();const input=testForm.querySelector('input[type="email"]');try{const res=await api('/api/email-settings/test',{method:'POST',body:JSON.stringify({recipient:input?.value||''})});toast(res.message);await loadEmailDeliveryActivity();}catch(e){toast(e.message,'error');}});
+      async function loadEmailDeliveryActivity(){
+        try{
+          const records=await api('/api/audit-logs?search=EMAIL');
+          const delivery=records.filter(r=>['EMAIL_SENT','EMAIL_FAILED','EMAIL_SKIPPED','SEND_TEST','DAILY_SUMMARY'].includes(r.action)).slice(0,8);
+          const table=[...document.querySelectorAll('table')].find(t=>(t.querySelector('thead')?.textContent||'').toLowerCase().includes('event'));
+          if(!table)return;const tbody=table.querySelector('tbody');if(!tbody)return;tbody.replaceChildren();
+          if(!delivery.length){tbody.innerHTML='<tr><td colspan="3" class="empty-data" style="padding:16px">No delivery attempts have been recorded yet.</td></tr>';return;}
+          delivery.forEach(r=>{const tr=document.createElement('tr');const detail=String(r.details||'');const event=(detail.match(/Event ([^;]+)/i)||[])[1]||r.action.replaceAll('_',' ');const recipient=(detail.match(/recipients?: ([^;]+)/i)||[])[1]||r.entity_label||'—';const status=['EMAIL_SENT','SEND_TEST','DAILY_SUMMARY'].includes(r.action)?'Sent':(r.action==='EMAIL_SKIPPED'?'Skipped':'Failed');tr.innerHTML=`<td>${esc(recipient)}</td><td>${esc(event)}</td><td>${badge(status)}</td>`;tbody.appendChild(tr);});
+        }catch(_){/* delivery history is admin-only */}
+      }
+      await loadEmailDeliveryActivity();
+      if(rulesForm)rulesForm.addEventListener('click',async ev=>{ev.preventDefault();try{const settings=await api('/api/email-settings');const rules={};toggleRows.forEach(row=>{const k=eventRuleKey(row.querySelector('strong')?.textContent||'');const checkbox=row.querySelector('input[type="checkbox"]');if(checkbox)rules[k]=checkbox.checked;});settings.event_rules=rules;settings.smtp_password='';await api('/api/email-settings',{method:'PUT',body:JSON.stringify(settings)});toast('Global email notification rules saved.');}catch(e){toast(e.message,'error');}});
+    } else {
+      try {
+        const result=await api('/api/notification-preferences');
+        toggleRows.forEach(row=>{const key=eventRuleKey(row.querySelector('strong')?.textContent||'');const cb=row.querySelector('input[type="checkbox"]');if(cb&&result.preferences&&Object.prototype.hasOwnProperty.call(result.preferences,key))cb.checked=Boolean(result.preferences[key]);});
+      } catch(e){toast(e.message,'error');}
+      if(rulesForm)rulesForm.addEventListener('click',async ev=>{ev.preventDefault();const preferences={};toggleRows.forEach(row=>{const k=eventRuleKey(row.querySelector('strong')?.textContent||'');const checkbox=row.querySelector('input[type="checkbox"]');if(checkbox)preferences[k]=checkbox.checked;});try{const result=await api('/api/notification-preferences',{method:'PUT',body:JSON.stringify({preferences})});toast(result.message||'Preferences saved.');}catch(e){toast(e.message,'error');}});
+    }
   }
+
+  async function handleAuditPage() {
+    if(currentUser.role!=='admin')return;
+    const form=document.getElementById('audit-filter-form');const table=document.querySelector('.audit-table');if(!form||!table)return;
+    let auditRows=[];const actionSelect=document.getElementById('audit-action');const entitySelect=document.getElementById('audit-entity');const search=document.getElementById('audit-search');const from=document.getElementById('audit-from');const to=document.getElementById('audit-to');const count=document.getElementById('audit-count');
+    async function fetchRows(useFilters=true){const qs=new URLSearchParams();if(useFilters){if(search.value.trim())qs.set('search',search.value.trim());if(actionSelect.value)qs.set('action',actionSelect.value);if(entitySelect.value)qs.set('entity',entitySelect.value);if(from.value)qs.set('from_date',from.value);if(to.value)qs.set('to_date',to.value);}try{auditRows=await api('/api/audit-logs'+(qs.toString()?'?'+qs.toString():''));loadedRows['audit-logs']=auditRows;renderTable('audit-logs',auditRows,table,file);if(count)count.textContent=`Showing ${auditRows.length} record${auditRows.length===1?'':'s'}`;}catch(e){toast(e.message,'error');}}
+    await fetchRows(false);
+    const actions=[...new Set((auditRows||[]).map(r=>r.action).filter(Boolean))].sort();actions.forEach(value=>{const option=document.createElement('option');option.value=value;option.textContent=value.replaceAll('_',' ');actionSelect.appendChild(option);});
+    form.addEventListener('submit',ev=>{ev.preventDefault();fetchRows(true);});document.getElementById('audit-clear')?.addEventListener('click',()=>{form.reset();fetchRows(false);});
+    document.getElementById('audit-export')?.addEventListener('click',()=>{const headers=['Date','User','Role','Action','Entity','Entity ID','Summary','IP','Changes'];const rows=auditRows.map(r=>[r.created_at,r.user_name,r.actor_role,r.action,r.entity_label||r.module,r.entity_id,r.details,r.ip_address,JSON.stringify(r.changes||{})]);const csv=[headers,...rows].map(row=>row.map(v=>'"'+String(v??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');const blob=new Blob([csv],{type:'text/csv;charset=utf-8;'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='golden-pride-audit-log.csv';a.click();URL.revokeObjectURL(url);toast('Audit log exported.');});
+    document.addEventListener('click',async ev=>{const button=ev.target.closest('[data-audit-view]');if(!button)return;try{const record=await api(`/api/audit-logs/${encodeURIComponent(button.dataset.auditView)}`);let dialog=document.getElementById('audit-changes-dialog');if(!dialog){dialog=document.createElement('dialog');dialog.id='audit-changes-dialog';dialog.className='audit-changes-dialog';document.body.appendChild(dialog);}const changes=record.changes||{};const rows=Object.entries(changes).map(([key,val])=>`<tr><td><strong>${esc(key.replaceAll('_',' '))}</strong></td><td>${esc(val?.from===null||val?.from===undefined?'—':(typeof val.from==='object'?JSON.stringify(val.from):String(val.from)))}</td><td>${esc(val?.to===null||val?.to===undefined?'—':(typeof val.to==='object'?JSON.stringify(val.to):String(val.to)))}</td></tr>`).join('');dialog.innerHTML=`<div class="audit-dialog-head"><div><strong>Audit details</strong><div class="subtitle">${esc(record.user_name||'System')} · ${esc(record.action)} · ${esc(record.entity_label||record.module||'')}</div></div><button type="button" class="btn btn-sm" data-audit-close>Close</button></div><div class="audit-dialog-body"><p><strong>Summary:</strong> ${esc(record.details||'—')}</p><p><strong>Entity:</strong> ${esc(record.module||'—')} / ${esc(record.entity_id||'—')} <strong style="margin-left:12px">IP:</strong> ${esc(record.ip_address||'—')}</p>${rows?`<h3 style="margin:18px 0 8px">Field changes</h3><table class="audit-change-grid"><thead><tr><th>Field</th><th>Previous value</th><th>New value</th></tr></thead><tbody>${rows}</tbody></table>`:'<p class="subtitle">No field-level changes were recorded for this event.</p>'}</div>`;if(dialog.showModal)dialog.showModal();else dialog.setAttribute('open','open');}catch(e){toast(e.message,'error');}});
+    document.addEventListener('click',ev=>{if(ev.target.closest('[data-audit-close]'))document.getElementById('audit-changes-dialog')?.close?.();});
+  }
+
+  async function handleChangePassword() {
+    if(file!=='change-password.html')return;const form=document.getElementById('change-password-form');if(!form)return;
+    form.addEventListener('submit',async ev=>{ev.preventDefault();const current=form.querySelector('[name="current_password"]')?.value||'';const next=form.querySelector('[name="new_password"]')?.value||'';const confirm=form.querySelector('[name="confirm_password"]')?.value||'';if(next!==confirm){toast('The new password and confirmation do not match.','error');return;}if(next.length<10){toast('Use at least 10 characters for the new password.','error');return;}try{const result=await api('/api/auth/change-password',{method:'POST',body:JSON.stringify({current_password:current,new_password:next})});currentUser.must_change_password=false;toast(result.message);location.href=homeByRole[currentUser.role]||'login.html';}catch(e){toast(e.message,'error');}});
+  }
+
   async function handleRoleForm() {
     if(file!=='add-role.html' || currentUser.role!=='admin')return;
     const form=getMainForm();if(!form)return;
@@ -619,24 +909,10 @@
   function setupCustomerEntityMode(isEdit) {
     customerEntityMode = true;
     customerEditMode = Boolean(isEdit);
-    const form=getMainForm(); if(!form) return;
-    const grid=form.querySelector('.form-grid');
-    const hideLabels=new Set(['password','role','support team']);
-    form.querySelectorAll('.field').forEach(field=>{
-      if(hideLabels.has(labelForField(field))) {
-        field.style.display='none';
-        field.querySelectorAll('input,select,textarea').forEach(control=>{control.disabled=true;control.required=false;});
-      }
-    });
-    const fields=[['Phone','phone','tel'],['Address','address','text'],['Primary contact','contact_name','text']];
-    fields.forEach(([label,name,type])=>{
-      const wrapper=document.createElement('div');wrapper.className='field';
-      wrapper.innerHTML=`<label>${label}</label><input class="input" type="${type}" data-customer-edit-field="${name}" value="">`;
-      grid?.appendChild(wrapper);
-    });
-    const title=document.querySelector('main h1');if(title)title.textContent=isEdit?'Edit customer':'Create customer';
-    const submit=form.querySelector('button[type="submit"]');if(submit)submit.textContent=isEdit?'Save customer changes':'Create customer record';
-    const intro=document.querySelector('.notice');if(intro)intro.textContent=isEdit?'Update the customer record saved in the database.':'Create a customer organization record. Login accounts are managed separately.';
+    const title=document.querySelector('main h1'); if(title) title.textContent=isEdit?'Edit customer':'Add customer';
+    const subtitle=document.querySelector('main .subtitle'); if(subtitle) subtitle.textContent=isEdit?'Update the customer organization profile':'Create a customer organization profile';
+    const intro=document.querySelector('.notice'); if(intro) intro.textContent=isEdit?'Edit the saved company details and save your changes.':'Create a customer organization profile. User login accounts are managed separately in User Management.';
+    const form=getMainForm(); const submit=form?.querySelector('button[type="submit"]'); if(submit) submit.textContent=isEdit?'Save customer changes':'Create customer';
   }
 
   async function initPage() {
@@ -647,8 +923,8 @@
     if(!profileAndGuard())return;
     try { await loadLookups(); } catch(_) {}
     let cfg=formConfig[file];
-    if(file==='add-customer.html' && (params.get('edit_customer')==='1' || params.get('record')==='customer')) {
-      const isEdit=params.get('edit_customer')==='1';
+    if(file==='add-customer.html') {
+      const isEdit=Boolean(idParam);
       setupCustomerEntityMode(isEdit);
       cfg=customerEntityConfig;
     }
@@ -658,23 +934,22 @@
       try { await fillEditForm(cfg); } catch(e){toast(e.message,'error');}
       await handleStandardForm(cfg);
     }
-    if(file==='ticket-detail.html') await handleTicketDetail();
+    if(file==='ticket-detail.html') { await handleTicketDetail(); await handleStaffTicketConversation(); }
     if(file==='user-create-ticket.html') await handleCustomerCreateTicket();
     if(file==='user-ticket-detail.html') await handleTicketConversation();
     if(file==='asset-detail.html' || file==='customer-detail.html') await handleEditDetails();
     if(file==='email-notifications.html') await handleEmailPage();
+    if(file==='change-password.html') await handleChangePassword();
     if(file==='add-role.html') await handleRoleForm();
     if(pageResource[file]) await loadList(pageResource[file]);
+    if(file==='audit-log.html') await handleAuditPage();
     if(['dashboard.html','admin-dashboard.html','agent-dashboard.html','user-dashboard.html'].includes(file)) {
       try {const stats=await api('/api/dashboard/stats');updateDashboard(stats);if(file==='user-dashboard.html'){const t=document.querySelector('table');if(t)renderTable('tickets',stats.recent_tickets||[],t,file);}}catch(_){}
     }
     installSearch();
+    try { const next=sessionStorage.getItem('gpNextScroll'); const same=sessionStorage.getItem('gpScroll:'+location.pathname+location.search); sessionStorage.removeItem('gpNextScroll'); const y=Number(next!==null?next:(same||0)); if(y>0) requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'auto'})); } catch (_) {}
     // Update older prototype-only copy without changing the supplied page layout/features.
     document.querySelectorAll('.notice').forEach(n=>{if(/static prototype does not save submitted data/i.test(n.textContent))n.textContent='Records are saved securely to the connected database when you submit this form.';if(/prototype mode/i.test(n.textContent)&&file==='email-notifications.html')n.textContent='Email delivery runs through the Python backend. Configure SMTP settings below to send notifications.';});
-    if(file==='add-customer.html'){
-      const teamField=[...document.querySelectorAll('.field')].find(f=>labelForField(f)==='support team');const input=teamField?.querySelector('input');
-      if(input){const select=document.createElement('select');select.className='select';select.innerHTML='<option value="">Select support team</option>'; (lookupData.teams||[]).forEach(t=>select.insertAdjacentHTML('beforeend',`<option value="${t.team_id}">${esc(t.team_name)}</option>`));input.replaceWith(select);}
-    }
   }
   if(file==='login.html') initLogin();
   else initPage();
