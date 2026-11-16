@@ -1,7 +1,109 @@
 <!DOCTYPE html>
 
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Agent Dashboard | Golden Pride</title><link href="css/style.css" rel="stylesheet"/></head><body><div class="app"><aside class="sidebar"><a class="brand" href="agent-dashboard.html"><span class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a><div class="nav-label">SUPPORT OPERATIONS</div><nav class="nav"><a class="active" href="agent-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a href="tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a><a href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span class="nav-icon">▧</span><span>Assets</span></a></nav><div class="sidebar-bottom"><div class="avatar" data-customer-avatar="">GP</div><div><strong data-customer-name="">Signed-in customer</strong><small data-customer-email="">customer@goldenpride.local</small><a class="logout-link" data-logout="" href="login.html">Sign out ↗</a></div></div></aside><main class="main"><header class="topbar"><div><div class="eyebrow">Golden Pride / Support workspace</div><h1>Agent Dashboard</h1><p class="subtitle">Your assigned tickets, ticket workload and permitted support tools</p></div><div class="top-actions"><span class="role-chip">Agent session</span></div></header><div id="access-notice"></div><div class="role-hero"><div><h2>Welcome, <span data-customer-name="">Support Agent</span></h2><p>Work on tickets assigned directly to you, and consult related customer and support records. Unassigned tickets remain in the Admin dispatch queue. Administration and security settings are unavailable.</p></div><span class="role-chip">◉ Agent · Scoped access</span></div><div class="stats"><div class="stat"><div class="stat-top">Tickets</div><strong>—</strong><small>Your assigned tickets</small></div><div class="stat"><div class="stat-top">Assigned to me</div><strong>—</strong><small>Active work items</small></div><div class="stat"><div class="stat-top">Waiting for response</div><strong>—</strong><small>Customer follow-up</small></div><div class="stat"><div class="stat-top">SLA at risk</div><strong>—</strong><small>Prioritize these tickets</small></div></div><section class="card dashboard-chart-card">
-<div class="card-head"><div><h2>Active Ticket Activity · Last 7 Days</h2><p>Active tickets created, grouped by status</p></div><span class="live-indicator">Live database</span></div>
-<div class="card-body"><div aria-live="polite" data-dashboard-status-chart=""><p class="muted">Loading live ticket data…</p></div></div>
-</section>
-<div class="access-callout">Your role can view tickets assigned to you or routed to your Support Team. On tickets assigned directly to you, you can send public replies, add internal notes for Admin, and change the ticket status. Priority, assignment, due date and ticket details remain Admin-only. Customer, project, contract, support-plan, service, contact and asset records are read-only. User Management, Roles &amp; Access, SMTP configuration and Audit Log are restricted.</div><div class="two-col"><section class="card"><div class="card-head"><h2>Allowed operations</h2></div><div class="card-body item-list"><div class="item"><span>Reply and add internal notes on assigned tickets</span><span class="badge closed">Allowed</span></div><div class="item"><span>View linked customer information</span><span class="badge closed">Allowed</span></div><div class="item"><span>View support plans and assets</span><span class="badge closed">Allowed</span></div><div class="item"><span>Change status on assigned tickets</span><span class="badge closed">Allowed</span></div><div class="item"><span>Manage users and access</span><span class="badge high">Blocked</span></div><div class="item"><span>Change SMTP / system settings</span><span class="badge high">Blocked</span></div><div class="item"><span>View audit log</span><span class="badge high">Blocked</span></div></div></section></div><div class="footer">Golden Pride · Role-scoped UI prototype</div></main></div><script defer="" src="js/app.js"></script></body></html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Agent Dashboard | Golden Pride</title>
+    <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar"><a class="brand" href="agent-dashboard.html"><span
+                    class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service
+                        workspace</small></span></a>
+
+            <nav class="nav"><a class="active" href="agent-dashboard.html"><span
+                        class="nav-icon">▦</span><span>Dashboard</span></a><a href="tickets.html"><span
+                        class="nav-icon">▤</span><span>My Tickets</span></a><a href="customers.html"><span
+                        class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+                        class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+                        class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+                        class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+                        class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+                        class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+                        class="nav-icon">▧</span><span>Assets</span></a></nav>
+            <div class="sidebar-bottom">
+                <div class="avatar" data-customer-avatar="">GP</div>
+                <div><strong data-customer-name="">Signed-in customer</strong><small
+                        data-customer-email="">customer@goldenpride.local</small><a class="logout-link" data-logout=""
+                        href="login.html">Sign out ↗</a></div>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <div class="eyebrow">Golden Pride / Support workspace</div>
+                    <h1>Agent Dashboard</h1>
+
+                </div>
+                <div class="top-actions"></div>
+            </header>
+            <div id="access-notice"></div>
+            <div class="role-hero">
+                <div>
+                    <h2>Welcome, <span data-customer-name="">Support Agent</span></h2>
+                    <p>Work on tickets assigned directly to you, and consult related customer and support records.
+                        Unassigned tickets remain in the Admin dispatch queue. Administration and security settings are
+                        unavailable.</p>
+                </div><span class="role-chip">◉ Agent · Scoped access</span>
+            </div>
+            <div class="stats">
+                <div class="stat">
+                    <div class="stat-top">Tickets</div><strong>—</strong><small>Your assigned tickets</small>
+                </div>
+                <div class="stat">
+                    <div class="stat-top">Assigned to me</div><strong>—</strong><small>Active work items</small>
+                </div>
+                <div class="stat">
+                    <div class="stat-top">Waiting for response</div><strong>—</strong><small>Customer follow-up</small>
+                </div>
+                <div class="stat">
+                    <div class="stat-top">SLA at risk</div><strong>—</strong><small>Prioritize these tickets</small>
+                </div>
+            </div>
+            <section class="card dashboard-chart-card">
+                <div class="card-head">
+                    <div>
+                        <h2>Active Ticket Activity · Last 7 Days</h2>
+                        <p>Active tickets created, grouped by status</p>
+                    </div><span class="live-indicator">Live database</span>
+                </div>
+                <div class="card-body">
+                    <div aria-live="polite" data-dashboard-status-chart="">
+                        <p class="muted">Loading live ticket data…</p>
+                    </div>
+                </div>
+            </section>
+
+            <div class="two-col">
+                <section class="card">
+                    <div class="card-head">
+                        <h2>Allowed operations</h2>
+                    </div>
+                    <div class="card-body item-list">
+                        <div class="item"><span>Reply and add internal notes on assigned tickets</span><span
+                                class="badge closed">Allowed</span></div>
+                        <div class="item"><span>View linked customer information</span><span
+                                class="badge closed">Allowed</span></div>
+                        <div class="item"><span>View support plans and assets</span><span
+                                class="badge closed">Allowed</span></div>
+                        <div class="item"><span>Change status on assigned tickets</span><span
+                                class="badge closed">Allowed</span></div>
+                        <div class="item"><span>Manage users and access</span><span class="badge high">Blocked</span>
+                        </div>
+                        <div class="item"><span>Change SMTP / system settings</span><span
+                                class="badge high">Blocked</span></div>
+                        <div class="item"><span>View audit log</span><span class="badge high">Blocked</span></div>
+                    </div>
+                </section>
+            </div>
+
+        </main>
+    </div>
+    <script defer="" src="js/app.js"></script>
+</body>
+
+</html>

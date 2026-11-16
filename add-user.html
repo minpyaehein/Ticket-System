@@ -24,14 +24,17 @@
             class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
             class="nav-icon">▧</span><span>Assets</span></a>
 
-        <a href="users.html" class="active"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a
-          href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles & Access</span></a><a
-          href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a><a
-          href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a>
+        <a href="users.html" class="active"><span class="nav-icon">♟</span><span>User Management</span></a><a
+          href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
       </nav>
       <div class="sidebar-bottom">
         <div class="avatar" data-customer-avatar>SA</div>
-        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
       </div>
     </aside>
     <main class="main">
@@ -59,10 +62,10 @@
           <div class="notice">A real invitation requires a connected backend or email service.</div>
           <form action="#" method="post">
             <div class="form-grid">
-              <div class="field "><label>Full name *</label><input class="input" type="text" placeholder="Full name" required
-                  value=""></div>
-              <div class="field "><label>Email *</label><input class="input" type="email"
-                  placeholder="user@company.com" required value=""></div>
+              <div class="field "><label>Full name *</label><input class="input" type="text" placeholder="Full name"
+                  required value=""></div>
+              <div class="field "><label>Email *</label><input class="input" type="email" placeholder="user@company.com"
+                  required value=""></div>
               <div class="field "><label>Password *</label><input class="input" type="password"
                   placeholder="Enter a temporary password" required value=""></div>
               <div class="field "><label>Role</label><select class="select">
@@ -70,8 +73,21 @@
                   <option value="agent">Agent</option>
                   <option value="admin">Administrator</option>
                 </select></div>
-              <div class="field full" data-agent-team-field><label>Support Team *</label><select class="select" data-agent-team-select required><option value="">Select support team</option><option value="__other__">Other (Add new team)</option></select><div class="field" data-user-other-team-field hidden style="display:none;margin-top:10px"><label>New Support Team *</label><input class="input" type="text" maxlength="160" placeholder="Enter the new Support Team name" data-user-other-team-name></div><small class="subtitle">Choose one Support Team for this Agent, or select Other to add a new team. Customers and Administrators do not belong to a support team.</small></div>
-              <div class="field full" data-agent-request-field><label>Request Type *</label><select class="select" data-agent-request-select required><option value="">Select request type</option></select></div>
+              <div class="field full" data-agent-team-field><label>Support Team *</label><select class="select"
+                  data-agent-team-select required>
+                  <option value="">Select support team</option>
+                  <option value="__other__">Other (Add new team)</option>
+                </select>
+                <div class="field" data-user-other-team-field hidden style="display:none;margin-top:10px"><label>New
+                    Support Team *</label><input class="input" type="text" maxlength="160"
+                    placeholder="Enter the new Support Team name" data-user-other-team-name></div><small
+                  class="subtitle">Choose one Support Team for this Agent, or select Other to add a new team. Customers
+                  and Administrators do not belong to a support team.</small>
+              </div>
+              <div class="field full" data-agent-request-field><label>Request Type *</label><select class="select"
+                  data-agent-request-select required>
+                  <option value="">Select request type</option>
+                </select></div>
 
               <div class="field full"><label>Notes</label><textarea class="textarea"
                   placeholder="Optional notes"></textarea></div>
@@ -81,7 +97,7 @@
           </form>
         </div>
       </section>
-      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+
     </main>
   </div>
   <script src="js/app.js" defer></script>

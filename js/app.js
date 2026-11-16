@@ -1179,7 +1179,7 @@
       else if (label.includes('my open') || label.includes('open ticket')) strong.textContent = stats.open_tickets ?? 0;
       else if (label.includes('waiting')) strong.textContent = stats.waiting ?? 0;
       else if (label.includes('resolved')) strong.textContent = stats.resolved ?? 0;
-      else if (label === 'users' || label.includes('active users')) strong.textContent = stats.users ?? 0;
+      else if (label.includes('user')) strong.textContent = stats.users ?? 0;
       else if (label === 'projects') strong.textContent = stats.projects ?? 0;
       else if (label.includes('asset')) strong.textContent = stats.assets ?? 0;
       else if (label.includes('contract')) strong.textContent = stats.contracts ?? 0;
@@ -2723,13 +2723,16 @@
     const main = document.querySelector('.main');
     if (!sidebar || !main || document.getElementById('gp-mobile-menu-toggle')) return;
 
+    document.body.classList.add('gp-responsive-nav-ready');
     const toggle = document.createElement('button');
     toggle.type = 'button';
     toggle.id = 'gp-mobile-menu-toggle';
     toggle.className = 'mobile-menu-toggle';
     toggle.setAttribute('aria-label', 'Open navigation menu');
     toggle.setAttribute('aria-expanded', 'false');
-    toggle.innerHTML = '<span></span><span></span><span></span><b>Menu</b>';
+    if (!sidebar.id) sidebar.id = 'gp-sidebar-navigation';
+    toggle.setAttribute('aria-controls', sidebar.id);
+    toggle.innerHTML = '<span></span>';
 
     const backdrop = document.createElement('button');
     backdrop.type = 'button';

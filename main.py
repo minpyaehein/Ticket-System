@@ -3,6 +3,7 @@
 Serves the existing HTML/CSS interface and its JSON API from one origin. PostgreSQL
 is the intended production database; configure DATABASE_URL in .env before running.
 """
+
 from __future__ import annotations
 
 import asyncio

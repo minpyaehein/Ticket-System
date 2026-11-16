@@ -1,20 +1,185 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Admin Dashboard | Golden Pride</title><link href="css/style.css" rel="stylesheet"/></head><body><div class="app"><aside class="sidebar"><a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a><div class="nav-label">ADMINISTRATION</div><nav class="nav"><a class="active" href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles &amp; Access</span></a><a href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a></nav><div class="sidebar-bottom"><div class="avatar" data-customer-avatar="">GP</div><div><strong data-customer-name="">Signed-in customer</strong><small data-customer-email="">customer@goldenpride.local</small><a class="logout-link" data-logout="" href="login.html">Sign out ↗</a></div></div></aside><main class="main"><header class="topbar"><div><div class="eyebrow">Golden Pride / Admin workspace</div><h1>Admin Dashboard</h1><p class="subtitle">System-wide monitoring and configuration</p></div><div class="top-actions"><span class="role-chip">Admin session</span></div></header><div id="access-notice"></div><div class="role-hero"><div><h2>Welcome, <span data-customer-name="">Administrator</span></h2><p>Full workspace access — manage records, users, policies and system notifications.</p></div><span class="role-chip">🛡 Admin · Full access</span></div><div class="stats"><div class="stat"><div class="stat-top">Active tickets</div><strong>—</strong><small>All work queues</small></div><div class="stat"><div class="stat-top">Open tickets</div><strong>—</strong><small>Workspace-wide</small></div><div class="stat"><div class="stat-top">Active users</div><strong>—</strong><small>All account roles</small></div><div class="stat"><div class="stat-top">SLA at risk</div><strong>—</strong><small>Needs attention</small></div></div><section class="card dashboard-chart-card">
-<div class="card-head"><div><h2>Active Ticket Activity · Last 7 Days</h2><p>Active tickets created, grouped by status</p></div><span class="live-indicator">Live database</span></div>
-<div class="card-body"><div aria-live="polite" data-dashboard-status-chart=""><p class="muted">Loading live ticket data…</p></div></div>
-</section>
-<section class="card dashboard-module-card">
-  <div class="card-head">
-    <div><h2>Overall Module Records</h2><p>Active and deactivated records from PostgreSQL across all eight modules</p></div>
-    <span class="live-indicator" data-dashboard-refreshed>Live PostgreSQL data</span>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width,initial-scale=1" name="viewport" />
+  <title>Admin Dashboard | Golden Pride</title>
+  <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a class="active" href="dashboard.html"><span
+            class="nav-icon">▦</span><span>Dashboard</span></a><a href="tickets.html"><span
+            class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles &amp; Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar="">GP</div>
+        <div><strong data-customer-name="">Signed-in customer</strong><small
+            data-customer-email="">customer@goldenpride.local</small><a class="logout-link" data-logout=""
+            href="login.html">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Admin workspace</div>
+          <h1>Admin Dashboard</h1>
+
+        </div>
+        <div class="top-actions"></div>
+      </header>
+      <div id="access-notice"></div>
+      <div class="role-hero">
+        <div>
+          <h2>Welcome, <span data-customer-name="">Administrator</span></h2>
+          <p>Full workspace access — manage records, users, policies and system notifications.</p>
+        </div><span class="role-chip">🛡 Admin · Full access</span>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-top">Active tickets</div><strong>—</strong><small>All work queues</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Open tickets</div><strong>—</strong><small>Workspace-wide</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Active users</div><strong>—</strong><small>All account roles</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">SLA at risk</div><strong>—</strong><small>Needs attention</small>
+        </div>
+      </div>
+      <section class="card dashboard-chart-card">
+        <div class="card-head">
+          <div>
+            <h2>Active Ticket Activity · Last 7 Days</h2>
+
+          </div><span class="live-indicator">Live database</span>
+        </div>
+        <div class="card-body">
+          <div aria-live="polite" data-dashboard-status-chart="">
+            <p class="muted">Loading live ticket data…</p>
+          </div>
+        </div>
+      </section>
+      <section class="card dashboard-module-card">
+        <div class="card-head">
+          <div>
+            <h2>Overall Module Records</h2>
+          </div>
+          <span class="live-indicator" data-dashboard-refreshed>Live PostgreSQL data</span>
+        </div>
+        <div class="card-body">
+          <div class="dashboard-module-legend"><span><i class="dashboard-module-dot active"></i>Active</span><span><i
+                class="dashboard-module-dot inactive"></i>Deactivated</span></div>
+          <div class="dashboard-module-chart" data-dashboard-module-chart aria-live="polite">
+            <p class="muted">Loading live module data…</p>
+          </div>
+        </div>
+      </section>
+      <div class="two-col dashboard-overview-grid">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Agent Overview</h2>
+              <p>Assigned ticket workload by active agent</p>
+            </div><a class="btn btn-sm" href="users.html">Manage agents</a>
+          </div>
+          <div class="card-body dashboard-overview-list" data-dashboard-agent-overview="">
+            <p class="muted">Loading agent data…</p>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Customer Overview</h2>
+              <p>Ticket activity by active customer</p>
+            </div><a class="btn btn-sm" href="customers.html">View customers</a>
+          </div>
+          <div class="card-body dashboard-overview-list" data-dashboard-customer-overview="">
+            <p class="muted">Loading customer data…</p>
+          </div>
+        </section>
+      </div>
+      <div class="permission-grid">
+        <div class="permission-tile"><span>Records</span><strong>Full CRUD</strong><small>Create, view, update and
+            deactivate</small></div>
+        <div class="permission-tile"><span>Administration</span><strong>Enabled</strong><small>Users, teams and access
+            policies</small></div>
+        <div class="permission-tile"><span>System settings</span><strong>Enabled</strong><small>Email, SLA and audit
+            log</small></div>
+      </div>
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Workspace administration</h2>
+              <p>Shortcuts allowed for Admin</p>
+            </div>
+          </div>
+          <div class="card-body item-list">
+            <div class="item">
+              <div><strong>Manage users</strong><small>Create and manage accounts</small></div><a class="btn btn-sm"
+                href="users.html">Open →</a>
+            </div>
+            <div class="item">
+              <div><strong>Roles &amp; access</strong><small>Review role permissions</small></div><a class="btn btn-sm"
+                href="roles-access.html">Open →</a>
+            </div>
+            <div class="item">
+              <div><strong>Email notifications</strong><small>Configure SMTP and templates</small></div><a
+                class="btn btn-sm" href="email-notifications.html">Open →</a>
+            </div>
+            <div class="item">
+              <div><strong>Audit log</strong><small>Review administrative activity</small></div><a class="btn btn-sm"
+                href="audit-log.html">Open →</a>
+            </div>
+            <div class="item">
+              <div><strong>Manage customers</strong><small>Customer master data</small></div><a class="btn btn-sm"
+                href="customers.html">Open →</a>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Access summary</h2>
+              <p>All modules are available in Admin role</p>
+            </div>
+          </div>
+          <div class="card-body">
+
+            <div class="item-list">
+              <div class="item"><span>Tickets / customer records</span><span class="badge closed">Full access</span>
+              </div>
+              <div class="item"><span>Projects / contracts / assets</span><span class="badge closed">Full access</span>
+              </div>
+              <div class="item"><span>Users / teams / roles</span><span class="badge closed">Full access</span></div>
+              <div class="item"><span>Email / audit / settings</span><span class="badge closed">Full access</span></div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+    </main>
   </div>
-  <div class="card-body">
-    <div class="dashboard-module-legend"><span><i class="dashboard-module-dot active"></i>Active</span><span><i class="dashboard-module-dot inactive"></i>Deactivated</span></div>
-    <div class="dashboard-module-chart" data-dashboard-module-chart aria-live="polite"><p class="muted">Loading live module data…</p></div>
-  </div>
-</section>
-<div class="two-col dashboard-overview-grid">
-<section class="card"><div class="card-head"><div><h2>Agent Overview</h2><p>Assigned ticket workload by active agent</p></div><a class="btn btn-sm" href="users.html">Manage agents</a></div><div class="card-body dashboard-overview-list" data-dashboard-agent-overview=""><p class="muted">Loading agent data…</p></div></section>
-<section class="card"><div class="card-head"><div><h2>Customer Overview</h2><p>Ticket activity by active customer</p></div><a class="btn btn-sm" href="customers.html">View customers</a></div><div class="card-body dashboard-overview-list" data-dashboard-customer-overview=""><p class="muted">Loading customer data…</p></div></section>
-</div>
-<div class="permission-grid"><div class="permission-tile"><span>Records</span><strong>Full CRUD</strong><small>Create, view, update and deactivate</small></div><div class="permission-tile"><span>Administration</span><strong>Enabled</strong><small>Users, teams and access policies</small></div><div class="permission-tile"><span>System settings</span><strong>Enabled</strong><small>Email, SLA and audit log</small></div></div><div class="two-col"><section class="card"><div class="card-head"><div><h2>Workspace administration</h2><p>Shortcuts allowed for Admin</p></div></div><div class="card-body item-list"><div class="item"><div><strong>Manage users</strong><small>Create and manage accounts</small></div><a class="btn btn-sm" href="users.html">Open →</a></div><div class="item"><div><strong>Roles &amp; access</strong><small>Review role permissions</small></div><a class="btn btn-sm" href="roles-access.html">Open →</a></div><div class="item"><div><strong>Email notifications</strong><small>Configure SMTP and templates</small></div><a class="btn btn-sm" href="email-notifications.html">Open →</a></div><div class="item"><div><strong>Audit log</strong><small>Review administrative activity</small></div><a class="btn btn-sm" href="audit-log.html">Open →</a></div><div class="item"><div><strong>Manage customers</strong><small>Customer master data</small></div><a class="btn btn-sm" href="customers.html">Open →</a></div></div></section><section class="card"><div class="card-head"><div><h2>Access summary</h2><p>All modules are available in Admin role</p></div></div><div class="card-body"><div class="notice success">All application modules are permitted for Admin in the Role &amp; Access matrix.</div><div class="item-list"><div class="item"><span>Tickets / customer records</span><span class="badge closed">Full access</span></div><div class="item"><span>Projects / contracts / assets</span><span class="badge closed">Full access</span></div><div class="item"><span>Users / teams / roles</span><span class="badge closed">Full access</span></div><div class="item"><span>Email / audit / settings</span><span class="badge closed">Full access</span></div></div></div></section></div><div class="footer">Golden Pride · Role-scoped UI prototype</div></main></div><script defer="" src="js/app.js"></script></body></html>
+  <script defer="" src="js/app.js"></script>
+</body>
+
+</html>

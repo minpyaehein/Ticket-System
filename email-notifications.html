@@ -397,13 +397,11 @@
         <div>
           <div class="eyebrow">Golden Pride / Service Desk</div>
           <h1>Email Notification Service</h1>
-          <p class="subtitle">SMTP delivery, ticket event rules, templates and delivery monitoring</p>
+
         </div>
         <div class="top-actions"><a class="btn btn-primary" href="tickets.html">Ticket Workspace</a></div>
       </header>
-      <div class="notice-strip" id="email-page-notice">Email notification settings are managed by Admin. In-app
-        notifications are delivered separately to each user's notification bell. Email timestamps and daily notification
-        scheduling use Myanmar Time (MMT, Asia/Yangon).</div>
+
       <div class="metric-grid" id="email-metrics">
         <div class="metric"><small>Queued</small><strong id="metric-queued">0</strong></div>
         <div class="metric"><small>Retry / Failed</small><strong id="metric-retry">0</strong></div>
@@ -415,12 +413,11 @@
         <div class="section-head">
           <div>
             <h2><span class="step">1</span>SMTP Settings</h2>
-            <p>Configure the mailbox used to send Ticket notification emails.</p>
+
           </div><label class="switch-line"><input id="smtp-enabled" type="checkbox"> Email Service Enabled</label>
         </div>
         <div class="section-body">
-          <div class="notice-strip">Recipient policy: Any Valid Email Address · Send only to valid email addresses.
-            External delivery depends on your SMTP provider and account permissions.</div>
+
           <div class="panel-grid smtp-layout">
             <div class="mini-panel">
               <h3>SMTP Connection</h3>
@@ -471,8 +468,7 @@
                 <div class="field"><label>Connection Timeout (seconds)</label><input id="smtp-timeout" type="number"
                     min="3" max="60" value="15"></div>
               </div>
-              <p class="field-help smtp-security-warning">Self-signed certificates disable normal certificate
-                verification. Use only with a trusted private mail server.</p>
+
             </div>
           </div>
           <div class="action-line"><button class="btn-light" id="reset-smtp" type="button">Reset Fields</button><button
@@ -485,22 +481,21 @@
           <div class="section-head">
             <div>
               <h2><span class="step">2</span>Test Email</h2>
-              <p>Confirm SMTP delivery before enabling Ticket notifications.</p>
+
             </div>
           </div>
           <div class="section-body">
             <div class="field"><label>Test Recipient</label><input id="test-recipient" type="email"
                 placeholder="admin@company.com"></div>
             <div class="action-line"><button class="btn-yellow" id="send-test" type="button">Send Test</button></div>
-            <p class="field-help" id="smtp-test-result">Use a real internal or external email address that you can
-              access.</p>
+
           </div>
         </section>
         <section class="section-card" id="rules-section">
           <div class="section-head">
             <div>
               <h2><span class="step">3</span>Ticket Event Rules</h2>
-              <p>Choose which Ticket events generate email notifications.</p>
+
             </div>
           </div>
           <div class="section-body">
@@ -514,7 +509,7 @@
         <div class="section-head">
           <div>
             <h2>Automation Timing</h2>
-            <p>Configure the automatic customer reminders and resolved-ticket closing policy.</p>
+
           </div>
         </div>
         <div class="section-body">
@@ -529,8 +524,7 @@
                   <option value="days">Days</option>
                 </select>
               </div>
-              <small class="field-help">Send once after the ticket has stayed in Pending Customer for the selected
-                duration (maximum 30 days).</small>
+
             </div>
             <div class="field">
               <label for="resolution-reminder-value">Resolution Confirmation Reminder</label>
@@ -542,8 +536,7 @@
                   <option value="days">Days</option>
                 </select>
               </div>
-              <small class="field-help">Send once if the ticket remains Resolved without customer confirmation (maximum
-                30 days).</small>
+
             </div>
             <div class="field">
               <label for="auto-close-value">Auto Close Resolved Tickets</label>
@@ -555,8 +548,7 @@
                   <option value="days">Days</option>
                 </select>
               </div>
-              <small class="field-help">Close a ticket after the selected duration in Resolved (maximum 90 days). Set 0
-                to disable automatic closing.</small>
+
             </div>
           </div>
           <div class="action-line"><button class="btn-yellow" id="save-automation-timing" type="button">Save Automation
@@ -568,8 +560,7 @@
         <div class="section-head">
           <div>
             <h2><span class="step">4</span>Email Templates</h2>
-            <p>Each event has a separate Admin, Agent and/or Customer template. Choose the recipient role and event
-              below. Variables are replaced when the email is queued.</p>
+
           </div>
         </div>
         <div class="section-body template-layout">
@@ -588,8 +579,7 @@
             <p class="field-help" style="margin-bottom:12px">Click a variable to insert it at the end of the selected
               field.</p>
             <div class="template-vars" id="template-vars"></div>
-            <p class="notice-strip" style="margin-top:14px">Example: {{ticket_no}} becomes the real Ticket No. for each
-              recipient.</p>
+
           </aside>
         </div>
       </section>
@@ -598,7 +588,7 @@
         <div class="section-head">
           <div>
             <h2><span class="step">5</span>Email Delivery Log</h2>
-            <p>Monitor queued, sent, retry and failed Ticket emails. Browse all delivery records 10 per page.</p>
+
           </div>
           <div class="delivery-tools"><select id="delivery-filter">
               <option value="all">All Status</option>
@@ -606,8 +596,7 @@
               <option value="sent">Sent</option>
               <option value="failed">Failed</option>
             </select><button class="btn-light" id="process-queue" type="button">Process Queue</button><button
-              class="btn-light" id="retry-failed" type="button">Retry Failed</button><button class="btn-light"
-              id="refresh-delivery" type="button">Refresh</button></div>
+              class="btn-light" id="retry-failed" type="button">Retry Failed</button></div>
         </div>
         <div class="section-body table-scroll">
           <table>
@@ -630,14 +619,17 @@
             </tbody>
           </table>
         </div>
-        <div class="table-foot" id="delivery-pagination"><span id="delivery-count">Loading email delivery records…</span><div class="gp-ticket-page-buttons" id="delivery-page-buttons"></div></div>
+        <div class="table-foot" id="delivery-pagination"><span id="delivery-count">Loading email delivery
+            records…</span>
+          <div class="gp-ticket-page-buttons" id="delivery-page-buttons"></div>
+        </div>
       </section>
 
       <section class="section-card" id="personal-preferences" style="display:none">
         <div class="section-head">
           <div>
             <h2>My Email Preferences</h2>
-            <p>Choose which email alerts you want to receive. This does not change your in-app notification rules.</p>
+
           </div>
         </div>
         <div class="section-body">
@@ -646,7 +638,7 @@
               Preferences</button></div>
         </div>
       </section>
-      <div class="footer">Golden Pride Service Workspace · Email and in-app notifications</div>
+
     </main>
   </div>
   <script src="js/app.js" defer></script>
