@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+        <meta charset="utf-8" />
+        <meta content="width=device-width,initial-scale=1" name="viewport" />
+        <title>My Dashboard | Golden Pride</title>
+        <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+        <div class="app">
+                <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+                                        class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service
+                                                workspace</small></span></a>
+                        <div class="nav-label">SELF SERVICE</div>
+                        <nav class="nav"><a class="active" href="user-dashboard.html"><span
+                                                class="nav-icon">▦</span><span>Dashboard</span></a><a
+                                        href="my-tickets.html"><span class="nav-icon">▤</span><span>My
+                                                Tickets</span></a><a href="user-create-ticket.html"><span
+                                                class="nav-icon">＋</span><span>New Request</span></a><a
+                                        href="user-service-catalog.html"><span class="nav-icon">☷</span><span>Service
+                                                Catalog</span></a><a href="user-assets.html"><span
+                                                class="nav-icon">▧</span><span>My Assets</span></a></nav>
+                        <div class="sidebar-bottom">
+                                <div class="avatar" data-customer-avatar="">GP</div>
+                                <div><strong data-customer-name="">Signed-in customer</strong><small
+                                                data-customer-email="">customer@goldenpride.local</small><a
+                                                class="logout-link" data-logout="" href="login.html">Sign out ↗</a>
+                                </div>
+                        </div>
+                </aside>
+                <main class="main">
+                        <header class="topbar">
+                                <div>
+                                        <div class="eyebrow">Golden Pride / Customer portal</div>
+                                        <h1>My Dashboard</h1>
+                                        <p class="subtitle">Self-service overview for your requests and linked assets
+                                        </p>
+                                </div>
+                                <div class="top-actions"><span class="role-chip">customer session</span></div>
+                        </header>
+                        <div id="access-notice"></div>
+                        <div class="role-hero">
+                                <div>
+                                        <h2>Welcome, <span data-customer-name="">Customer customer</span></h2>
+                                        <p>Submit requests, follow your tickets and browse services available to
+                                                customers.</p>
+                                </div><span class="role-chip">♙ customer · Self service</span>
+                        </div>
+                        <div class="stats">
+                                <div class="stat">
+                                        <div class="stat-top">My open requests</div><strong>—</strong><small>Currently
+                                                being handled</small>
+                                </div>
+                                <div class="stat">
+                                        <div class="stat-top">Waiting for me</div><strong>—</strong><small>Support needs
+                                                a reply</small>
+                                </div>
+                                <div class="stat">
+                                        <div class="stat-top">Resolved</div><strong>—</strong><small>Completed
+                                                requests</small>
+                                </div>
+                                <div class="stat">
+                                        <div class="stat-top">Available services</div>
+                                        <strong>—</strong><small>Customer-visible services</small>
+                                </div>
+                        </div>
+                        <section class="card dashboard-chart-card">
+                                <div class="card-head">
+                                        <div>
+                                                <h2>Active Ticket Activity · Last 7 Days</h2>
+                                                <p>Active tickets created, grouped by status</p>
+                                        </div><span class="live-indicator">Live database</span>
+                                </div>
+                                <div class="card-body">
+                                        <div aria-live="polite" data-dashboard-status-chart="">
+                                                <p class="muted">Loading live ticket data…</p>
+                                        </div>
+                                </div>
+                        </section>
+                        <div class="access-callout">You can create service requests, view and reply to your own tickets,
+                                browse
+                                customer-visible services and view assets linked to your profile. Customer master data,
+                                projects, contracts,
+                                customer administration and system settings are not available.</div>
+                        <div class="two-col">
+
+                                <section class="card">
+                                        <div class="card-head">
+                                                <h2>Self-service</h2>
+                                        </div>
+                                        <div class="card-body item-list">
+                                                <div class="item">
+                                                        <div><strong>Browse service catalog</strong><small>Find a
+                                                                        service to request</small></div><a
+                                                                class="btn btn-sm"
+                                                                href="user-service-catalog.html">Browse</a>
+                                                </div>
+                                                <div class="item">
+                                                        <div><strong>My linked assets</strong><small>View assets
+                                                                        assigned to you</small></div><a
+                                                                class="btn btn-sm" href="user-assets.html">View
+                                                                assets</a>
+                                                </div>
+                                                <div class="item"><span>Admin settings</span><span
+                                                                class="badge high">Restricted</span></div>
+                                                <div class="item"><span>Other customers' records</span><span
+                                                                class="badge high">Restricted</span></div>
+                                        </div>
+                                </section>
+                        </div>
+                        <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+                </main>
+        </div>
+        <script defer="" src="js/app.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Add contact | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html" class="active"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+</aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Add contact</h1>
+          <p class="subtitle">Add a person linked to a customer account</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form>
+        </div>
+      </header>
+      <div class="breadcrumb"><a href="contacts.html">Contacts</a> / Add contact</div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Contact details</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <form action="#" method="get">
+            <div class="form-grid">
+              <div class="field full"><label>Customer *</label><select class="select">
+                  <option>Select customer</option>
+                  <option>Nova Manufacturing</option>
+                  <option>Summit Trading</option>
+                  <option>Orchid Healthcare</option>
+                </select></div>
+              <div class="field "><label>Contact No</label><input class="input" type="text"
+                  placeholder="Generated automatically after save" value="" readonly></div>
+              <div class="field "><label>Full name *</label><input class="input" type="text"
+                  placeholder="Contact full name" value=""></div>
+
+              <div class="field "><label>Department</label><input class="input" type="text"
+                  placeholder="e.g. IT, Finance, Operations" value=""></div>
+
+              <div class="field "><label>Job title</label><input class="input" type="text" placeholder="Job title"
+                  value=""></div>
+              <div class="field "><label>Email *</label><input class="input" type="email" placeholder="name@company.com"
+                  value=""></div>
+              <div class="field "><label>Phone</label><input class="input" type="text" placeholder="+95 ..." value="">
+              </div>
+              <div class="field "><label>Type</label><select class="select">
+                  <option>Primary contact</option>
+                  <option>Technical contact</option>
+                  <option>Billing contact</option>
+                  <option>Escalation contact</option>
+                  <option>Other</option>
+                </select></div>
+              <div class="field full"><label>Notes</label><textarea class="textarea"
+                  placeholder="Contact notes"></textarea></div>
+            </div>
+            <div class="form-actions"><a class="btn" href="contacts.html">Cancel</a><button class="btn btn-primary"
+                type="submit">Create contact</button></div>
+          </form>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

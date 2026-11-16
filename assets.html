@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Assets | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html" class="active"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Assets</h1>
+          <p class="subtitle">Track customer equipment and assets linked to tickets</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form><a class="btn btn-primary" href="add-asset.html">+ Add asset</a>
+        </div>
+      </header>
+      <section class="card">
+        <div class="filters">
+          <div class="filter-grid">
+            <div class="field span-2"><label>Search</label><input class="input" type="text"
+                placeholder="Asset tag, serial or name" value=""></div>
+            <div class="field "><label>Status</label><select class="select">
+                <option>All statuses</option>
+                <option>In service</option>
+                <option>Assigned</option>
+                <option>Maintenance</option>
+                <option>Retired</option>
+              </select></div>
+          </div>
+          <div class="filter-actions" style="margin-top:14px"><button class="btn btn-primary"
+              type="submit">Search</button><a class="btn" href="tickets.html">Reset</a></div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Assets register</h2>
+            <p>Manage records and view related details</p>
+          </div>
+          <div class="inline"><a class="btn btn-sm" href="#">Export</a><a class="btn btn-primary btn-sm"
+              href="add-asset.html">+ Add asset</a></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>CUSTOMERS</th>
+                <th>PROJECT</th>
+                <th>ASSET TAG</th>
+                <th>ASSET NAME</th>
+                <th>TYPE</th>
+                <th>ASSET STATUS</th>
+                <th>SERVICE CATALOG</th>
+                <th>VENDOR</th>
+                <th>MODEL</th>
+                <th>SERIAL NO</th>
+                <th>IP ADDRESS</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span>Loading records…</span>
+          <div class="pagination"><a class="current" href="assets.html">1</a><a href="assets.html">2</a><a
+              href="assets.html">Next →</a></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Service Catalog | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+          class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a>
+      <div class="nav-label">SELF SERVICE</div>
+      <nav class="nav"><a href="user-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="my-tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a><a
+          href="user-create-ticket.html"><span class="nav-icon">＋</span><span>New Request</span></a><a
+          href="user-service-catalog.html" class="active"><span class="nav-icon">☷</span><span>Service
+            Catalog</span></a><a href="user-assets.html"><span class="nav-icon">▧</span><span>My Assets</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed-in customer</strong><small
+            data-customer-email>customer@goldenpride.local</small><a href="login.html" data-logout
+            class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Customer portal</div>
+          <h1>Service Catalog</h1>
+          <p class="subtitle">Browse services available to customer users</p>
+        </div>
+        <div class="top-actions"></div>
+      </header>
+      <div id="access-notice"></div>
+      <div class="notice">Only customer-visible services are shown. Internal request types and administration settings
+        are not available to the customer role.</div>
+      <div class="three-col">
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">⌘</div>
+            <h2 style="font-size:14px;margin:0 0 6px">Application access</h2>
+            <p class="subtitle" style="min-height:35px">Request access to an approved business application.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">◇</div>
+            <h2 style="font-size:14px;margin:0 0 6px">Software request</h2>
+            <p class="subtitle" style="min-height:35px">Request standard software installation or licensing.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">⇄</div>
+            <h2 style="font-size:14px;margin:0 0 6px">Network access</h2>
+            <p class="subtitle" style="min-height:35px">Request VPN or approved network connectivity help.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">▧</div>
+            <h2 style="font-size:14px;margin:0 0 6px">Hardware support</h2>
+            <p class="subtitle" style="min-height:35px">Report an issue with a device linked to your profile.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">♧</div>
+            <h2 style="font-size:14px;margin:0 0 6px">Account assistance</h2>
+            <p class="subtitle" style="min-height:35px">Get help with your service account.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-body">
+            <div class="stat-icon" style="margin-bottom:12px">✉</div>
+            <h2 style="font-size:14px;margin:0 0 6px">General support</h2>
+            <p class="subtitle" style="min-height:35px">Ask the service desk for non-urgent support.</p>
+            <div style="margin-top:16px"><a class="btn btn-primary btn-sm" href="user-create-ticket.html">Request
+                service →</a></div>
+          </div>
+        </section>
+      </div>
+      <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

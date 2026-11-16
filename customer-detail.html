@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Customer profile | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"
+          class="active"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+</aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1 data-customer-title>Customer profile</h1>
+          <p class="subtitle">Customer overview, contacts and active service relationships</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form>
+        </div>
+      </header>
+      <div class="breadcrumb" data-customer-breadcrumb><a href="customers.html">Customers</a> / Loading customer…</div>
+      <div class="inline" style="justify-content:space-between;margin-bottom:16px">
+        <div><span class="badge status-neutral" data-customer-active>Loading status…</span></div><a class="btn btn-primary"
+          href="add-customer.html">Edit customer</a>
+      </div>
+      <div class="stats">
+        <div class="stat">
+          <div class="stat-top">Open tickets</div><strong data-customer-stat="open_tickets">—</strong><small data-customer-stat-note="open_tickets">Live ticket records</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Projects</div><strong data-customer-stat="projects">—</strong><small data-customer-stat-note="projects">Live project records</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Assets</div><strong data-customer-stat="assets">—</strong><small data-customer-stat-note="assets">Registered assets</small>
+        </div>
+        <div class="stat">
+          <div class="stat-top">Contracts</div><strong data-customer-stat="contracts">—</strong><small data-customer-stat-note="contracts">Live contract records</small>
+        </div>
+      </div>
+      <div class="two-col">
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Customer information</h2>
+              <p class="subtitle" data-customer-last-updated>Loading live customer information…</p>
+            </div>
+          </div>
+          <div class="card-body">
+            <div class="item-list" data-customer-info>
+              <div class="item"><span>Company</span><strong data-customer-field="customer_name">Loading…</strong></div>
+              <div class="item"><span>Primary contact</span><strong data-customer-field="contact_name">—</strong></div>
+              <div class="item"><span>Email</span><strong data-customer-field="email">—</strong></div>
+              <div class="item"><span>Phone</span><strong data-customer-field="phone">—</strong></div>
+              <div class="item"><span>Address</span><strong data-customer-field="address">—</strong></div>
+            </div>
+          </div>
+        </section>
+        <section class="card">
+          <div class="card-head">
+            <div>
+              <h2>Related records</h2>
+              <p class="subtitle">Live records linked to this customer</p>
+            </div>
+          </div>
+          <div class="card-body customer-related-grid">
+            <div class="customer-related-section"><h3>Projects <small data-related-count="projects">—</small></h3><div class="item-list" data-related-list="projects"><p class="subtitle">Loading…</p></div></div>
+            <div class="customer-related-section"><h3>Contracts <small data-related-count="contracts">—</small></h3><div class="item-list" data-related-list="contracts"><p class="subtitle">Loading…</p></div></div>
+            <div class="customer-related-section"><h3>Assets <small data-related-count="assets">—</small></h3><div class="item-list" data-related-list="assets"><p class="subtitle">Loading…</p></div></div>
+            <div class="customer-related-section"><h3>Tickets <small data-related-count="tickets">—</small></h3><div class="item-list" data-related-list="tickets"><p class="subtitle">Loading…</p></div></div>
+          </div>
+        </section>
+      </div>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

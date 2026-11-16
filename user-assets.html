@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>My Assets | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar"><a class="brand" href="user-dashboard.html"><span
+          class="brand-mark">G</span><span><strong>Golden Pride</strong><small>Service workspace</small></span></a>
+      <div class="nav-label">SELF SERVICE</div>
+      <nav class="nav"><a href="user-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="my-tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a><a
+          href="user-create-ticket.html"><span class="nav-icon">＋</span><span>New Request</span></a><a
+          href="user-service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a><a
+          href="user-assets.html" class="active"><span class="nav-icon">▧</span><span>My Assets</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed-in customer</strong><small
+            data-customer-email>customer@goldenpride.local</small><a href="login.html" data-logout
+            class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Customer portal</div>
+          <h1>My Assets</h1>
+          <p class="subtitle">View devices linked to your requester profile</p>
+        </div>
+        <div class="top-actions"></div>
+      </header>
+      <div id="access-notice"></div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Assets linked to your profile</h2>
+            <p>Only assets assigned or associated with your account are in scope</p>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Asset tag</th>
+                <th>Asset name</th>
+                <th>Type</th>
+                <th>Assigned to</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+          </table>
+        </div>
+      </section>
+      <div class="notice">Other customers' assets and internal asset administration are restricted.</div>
+      <div class="footer">Golden Pride · Role-scoped UI prototype</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

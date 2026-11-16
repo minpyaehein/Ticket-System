@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Ticket details | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html" class="active"><span class="nav-icon">▤</span><span>Tickets</span></a><a
+          href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+</aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Ticket details</h1>
+          <p class="subtitle">Review ticket details, update permitted status and follow the activity timeline</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form>
+        </div>
+      </header>
+      <div class="breadcrumb"><a href="tickets.html">Tickets</a> / TKT-2026-007</div>
+      <div class="inline" style="justify-content:space-between;margin-bottom:16px">
+        <div class="inline"><span class="badge closed">Closed</span><span class="badge high">High priority</span><span
+            class="code">TKT-2026-007</span></div>
+        <div class="inline"><a class="btn" href="add-ticket.html">Edit ticket</a><a class="btn" href="#">Print</a></div>
+      </div>
+      <div class="two-col">
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <div>
+                <h2>Database connection timeout</h2>
+                <p>Created Oct 19, 2026 at 9:53 AM by customer portal</p>
+              </div>
+            </div>
+            <div class="card-body">
+              <div class="notice success">This ticket is closed. Resolution details are available below.</div>
+              <p>Customer is reporting intermittent timeout errors while connecting to the production database. Several
+                users are unable to load the reporting module.</p>
+              <div class="form-grid">
+                <div class="field "><label>Customer</label><strong>Nova Manufacturing</strong></div>
+                <div class="field "><label>Project</label><strong>General Support Project</strong></div>
+                <div class="field "><label>Contract</label><strong>AUTO-2-SUPPORT</strong></div>
+                <div class="field "><label>Request type</label><strong>Database Support</strong></div>
+                <div class="field "><label>Support Team</label><strong>—</strong></div>
+                <div class="field "><label>Assigned to</label><strong>Support Engineer</strong></div>
+                <div class="field "><label>Linked asset</label><strong>DB-SRV-014</strong></div>
+              </div>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-head">
+              <h2>Conversation & activity</h2>
+            </div>
+            <div class="card-body item-list">
+              <div class="item">
+                <div><strong>Ticket resolved</strong><small>Support Engineer · Oct 19, 2026 · 11:18 AM</small>
+                  <p>Connection pool was adjusted and database service restarted. Customer confirmed service restored.
+                  </p>
+                </div>
+              </div>
+              <div class="item">
+                <div><strong>Ticket assigned</strong><small>System · Oct 19, 2026 · 10:05 AM</small>
+                  <p>Assigned to Support Engineer.</p>
+                </div>
+              </div>
+              <div class="item">
+                <div><strong>Ticket created</strong><small>Customer portal · Oct 19, 2026 · 9:53 AM</small></div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <div>
+          <section class="card">
+            <div class="card-head">
+              <h2>Ticket properties</h2>
+            </div>
+            <div class="card-body">
+              <form action="#" method="get">
+                <div class="field "><label>Status</label><select class="select">
+                    <option>Open</option>
+                    <option>In progress</option>
+                    <option>Pending Customer</option>
+                    <option>Resolved</option>
+                    <option>Closed</option>
+                  </select></div>
+                <div class="field "><label>Priority</label><select class="select">
+                    <option>High</option>
+                    <option>Critical</option>
+                    <option>Medium</option>
+                    <option>Low</option>
+                  </select></div>
+                <div class="field "><label>Assigned to</label><select class="select">
+                    <option>Support Engineer</option>
+                    <option>Aye Aye</option>
+                    <option>Ko Min</option>
+                    <option>Unassigned</option>
+                  </select></div>
+                <div class="field "><label>Due date</label><input class="input" type="date" placeholder=""
+                    value="2026-10-20"></div>
+                <div style="margin-top:14px"><button class="btn btn-primary" type="submit">Update properties</button>
+                </div>
+              </form>
+            </div>
+          </section>
+          <section class="card">
+            <div class="card-head">
+              <h2>SLA overview</h2>
+            </div>
+            <div class="card-body item-list">
+              <div class="item"><span>First response</span><span class="badge closed">Met · 12 min</span></div>
+              <div class="item"><span>Resolution target</span><span class="badge closed">Met · 1h 25m</span></div>
+              <div class="item"><span>Support plan</span><strong>Standard</strong></div>
+            </div>
+          </section>
+        </div>
+      </div>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>

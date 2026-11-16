@@ -1,0 +1,33 @@
+GOLDEN PRIDE — POSTGRESQL CONNECTION AND LIVE DASHBOARD
+
+1. Open the golden_pride_ticket_system folder in VS Code.
+2. Copy .env.example to a new file named .env in this same folder.
+3. Open .env and replace YOUR_POSTGRES_PASSWORD with the password for your PostgreSQL user.
+   Keep the database name golden_pride_ticket unless you intentionally use another name.
+4. In PowerShell, from this folder, run:
+
+   python -m venv .venv
+   .venv\Scripts\activate
+   pip install -r requirements.txt
+   uvicorn main:app --reload
+
+5. Open http://127.0.0.1:8000/api/health. It must return:
+   {"status":"ok","database":"connected"}
+6. Sign in and open the Admin Dashboard. The Overall Module Records graph refreshes
+   every 15 seconds from /api/dashboard/stats and uses these PostgreSQL tables:
+   tickets, customers, projects, contracts, plans, service_catalog, contacts, assets.
+
+COUNTING RULE:
+- Active is the number of rows whose database active column is TRUE.
+- Deactivated is the number of rows whose active column is FALSE.
+- The large active bar/count decreases when a record is deactivated; the deactivated
+  segment increases. Deactivation preserves the row and its history in PostgreSQL.
+- The admin module list pages continue to show inactive rows so they can be reactivated.
+
+IMPORTANT:
+Editing/removing an example number or row in an HTML file changes only that page's
+markup. It does not delete or update a PostgreSQL record. Database changes must go
+through the app's FastAPI API (the existing Create/Edit/Delete/Activate buttons) or
+through SQL in pgAdmin. Do not manually remove dashboard HTML numbers to change data.
+
+The ZIP intentionally does not contain a real .env file or database password.
