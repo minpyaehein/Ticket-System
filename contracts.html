@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Contracts | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html" class="active"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Contracts</h1>
+          <p class="subtitle">Track customer agreements, coverage and renewal dates</p>
+        </div>
+        <div class="top-actions">
+
+        </div>
+      </header>
+      <section class="card">
+        <div class="filters">
+          <div class="filter-grid">
+            <div class="field span-2"><label>Search</label><input class="input" type="text"
+                placeholder="Contract ID or customer" value=""></div>
+            <div class="field "><label>Status</label><select class="select">
+                <option>All statuses</option>
+                <option>Active</option>
+                <option>Expired</option>
+                <option>Renewing</option>
+              </select></div>
+          </div>
+          <div class="filter-actions" style="margin-top:14px"><button class="btn btn-primary"
+              type="submit">Search</button><a class="btn" href="tickets.html">Reset</a></div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Contracts register</h2>
+            <p>Manage records and view related details</p>
+          </div>
+          <div class="inline"><a class="btn btn-sm" href="#">Export</a><a class="btn btn-primary btn-sm"
+              href="add-contract.html">+ Add contract</a></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>CUSTOMER</th>
+                <th>PROJECT</th>
+                <th>CONTRACT NO</th>
+                <th>CONTRACT NAME</th>
+                <th>SUPPORT PLAN</th>
+                <th>START DATE</th>
+                <th>END DATE</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Infrastructure</a></td>
+                <td><a class="ticket-id" href="add-contract.html">AUTO-2-SUPPORT</a></td>
+                <td>NOVA-234</td>
+                <td>Nova Manufacturing</td>
+                <td>Standard</td>
+                <td>Jan 01, 2026</td>
+                <td>Dec 31, 2026</td>
+                <td><a class="btn btn-sm" href="add-contract.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Infrastructure</a></td>
+                <td><a class="ticket-id" href="add-contract.html">AUTO-2-SUPPORT</a></td>
+                <td>NOVA-234</td>
+                <td>Nova Manufacturing</td>
+                <td>Standard</td>
+                <td>Jan 01, 2026</td>
+                <td>Dec 31, 2026</td>
+                <td><a class="btn btn-sm" href="add-contract.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Infrastructure</a></td>
+                <td><a class="ticket-id" href="add-contract.html">AUTO-2-SUPPORT</a></td>
+                <td>NOVA-234</td>
+                <td>Nova Manufacturing</td>
+                <td>Standard</td>
+                <td>Jan 01, 2026</td>
+                <td>Dec 31, 2026</td>
+                <td><a class="btn btn-sm" href="add-contract.html">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span>Loading records…</span>
+          <div class="pagination"><a class="current" href="contracts.html">1</a><a href="contracts.html">2</a><a
+              href="contracts.html">Next →</a></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

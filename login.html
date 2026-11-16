@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Sign in | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="login-shell">
+    <section class="login-brand-panel">
+      <div><a class="brand" href="login.html" style="display:inline-flex;padding:0;border:0"><span
+            class="brand-mark">G</span><span><strong style="color:#fff">Golden Pride</strong><small>Service
+              workspace</small></span></a>
+        <h1>Support work,<br>all in one place.</h1>
+        <p>Sign in to manage customer requests, coordinate your team and keep every service interaction moving.</p>
+        <div class="login-feature-grid">
+          <div class="login-feature"><strong>⌘ Ticket desk</strong><small>Track requests and resolution</small></div>
+          <div class="login-feature"><strong>◈ Role-based views</strong><small>Access suited to your role</small></div>
+          <div class="login-feature"><strong>✉ Notifications</strong><small>Keep support conversations moving</small>
+          </div>
+        </div>
+      </div><small style="color:#8798b8;font-size:10px">GOLDEN PRIDE · SERVICE MANAGEMENT</small>
+    </section>
+    <section class="login-form-side">
+      <div class="login-card">
+        <div class="eyebrow">Welcome back</div>
+        <h2>Sign in to your account</h2>
+        <p class="login-sub">Enter your account email and password. Golden Pride will open the correct workspace
+          automatically.</p>
+        <div id="login-error" class="login-alert" role="alert">The username or password is incorrect.</div>
+        <form id="login-form">
+          <div class="field"><label for="username">Email / username</label><input class="input" id="username"
+              name="username" autocomplete="username" placeholder="you@goldenpride.local" required></div>
+          <div class="field"><label for="password">Password</label><input class="input" id="password" name="password"
+              type="password" autocomplete="current-password" placeholder="Enter your password" required></div>
+          <button class="btn btn-primary" type="submit">Sign in →</button>
+        </form>
+
+      </div>
+    </section>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

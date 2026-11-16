@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Email Notification Service | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .email-page {
+      max-width: 1500px;
+      margin: 0 auto
+    }
+
+    .email-page .metric-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 12px;
+      margin: 18px 0
+    }
+
+    .email-page .metric {
+      background: #fff;
+      border: 1px solid #e7e9ee;
+      border-radius: 13px;
+      padding: 15px 17px;
+      box-shadow: 0 3px 12px rgba(18, 30, 55, .035)
+    }
+
+    .email-page .metric small {
+      display: block;
+      color: #737b89;
+      font-size: 12px
+    }
+
+    .email-page .metric strong {
+      display: block;
+      font-size: 25px;
+      margin-top: 5px;
+      color: #202938
+    }
+
+    .email-page .section-card {
+      background: #fff;
+      border: 1px solid #e5e8ef;
+      border-radius: 14px;
+      margin: 16px 0;
+      overflow: hidden;
+      box-shadow: 0 4px 16px rgba(18, 30, 55, .035)
+    }
+
+    .email-page .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding: 17px 19px;
+      border-bottom: 1px solid #edf0f4
+    }
+
+    .email-page .section-head h2 {
+      font-size: 16px;
+      margin: 0 0 4px
+    }
+
+    .email-page .section-head p {
+      font-size: 12px;
+      color: #7b8492;
+      margin: 0
+    }
+
+    .email-page .step {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 25px;
+      height: 25px;
+      border-radius: 50%;
+      background: #ffd600;
+      color: #161616;
+      font-weight: 800;
+      margin-right: 8px
+    }
+
+    .email-page .section-body {
+      padding: 18px
+    }
+
+    .email-page .field-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 14px
+    }
+
+    .email-page .field {
+      min-width: 0
+    }
+
+    .email-page .field label {
+      display: block;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 6px;
+      color: #394253
+    }
+
+    .email-page .field input,
+    .email-page .field select,
+    .email-page .field textarea {
+      width: 100%;
+      min-width: 0;
+      border: 1px solid #d9dee7;
+      border-radius: 8px;
+      padding: 10px 11px;
+      background: #fff;
+      font: inherit;
+      font-size: 13px
+    }
+
+    .email-page .field-help {
+      font-size: 11px;
+      color: #818a98;
+      display: block;
+      margin-top: 5px
+    }
+
+    .email-page .panel-grid {
+      display: grid;
+      grid-template-columns: 1fr 1.1fr;
+      gap: 14px
+    }
+
+    .email-page .mini-panel {
+      border: 1px solid #e7eaf0;
+      border-radius: 11px;
+      padding: 15px
+    }
+
+    .email-page .mini-panel h3 {
+      font-size: 13px;
+      margin: 0 0 13px
+    }
+
+    .email-page .mini-panel .field-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr))
+    }
+
+    .email-page .switch-line {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .email-page .switch-line input {
+      accent-color: #f0c400;
+      width: 16px;
+      height: 16px
+    }
+
+    .email-page .action-line {
+      display: flex;
+      justify-content: flex-end;
+      gap: 8px;
+      margin-top: 15px;
+      flex-wrap: wrap
+    }
+
+    .email-page .btn-yellow {
+      background: #ffd400;
+      border: 1px solid #e5c000;
+      color: #191919;
+      border-radius: 8px;
+      padding: 10px 17px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer
+    }
+
+    .email-page .btn-light {
+      background: #fff;
+      border: 1px solid #dfe3ea;
+      border-radius: 8px;
+      padding: 9px 14px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer
+    }
+
+    .email-page .event-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 9px
+    }
+
+    .email-page .event-option {
+      display: flex;
+      align-items: flex-start;
+      gap: 9px;
+      padding: 11px;
+      border: 1px solid #e6e9ef;
+      border-radius: 9px;
+      min-height: 60px
+    }
+
+    .email-page .event-option input {
+      margin-top: 3px;
+      accent-color: #e9bc00
+    }
+
+    .email-page .event-option strong {
+      font-size: 12px;
+      display: block
+    }
+
+    .email-page .event-option small {
+      display: block;
+      color: #858d99;
+      font-size: 10px;
+      margin-top: 4px
+    }
+
+    .email-page .template-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 2fr) minmax(230px, 1fr);
+      gap: 15px
+    }
+
+    .email-page .template-vars {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px
+    }
+
+    .email-page .var-chip {
+      border: 1px solid #dce1e9;
+      background: #f8f9fb;
+      border-radius: 15px;
+      padding: 5px 8px;
+      font-size: 10px;
+      cursor: pointer;
+      color: #3f4a5a
+    }
+
+    .email-page .delivery-tools {
+      display: flex;
+      gap: 7px;
+      align-items: center;
+      flex-wrap: wrap
+    }
+
+    .email-page .delivery-tools select {
+      border: 1px solid #dce1e9;
+      border-radius: 8px;
+      padding: 8px;
+      font-size: 12px
+    }
+
+    .email-page .table-scroll {
+      overflow-x: auto
+    }
+
+    .email-page table {
+      width: 100%;
+      border-collapse: collapse;
+      min-width: 900px
+    }
+
+    .email-page th,
+    .email-page td {
+      padding: 11px 10px;
+      border-bottom: 1px solid #edf0f4;
+      text-align: left;
+      font-size: 11px;
+      vertical-align: top
+    }
+
+    .email-page th {
+      background: #f7f8fa;
+      color: #687282;
+      text-transform: uppercase;
+      font-size: 9px;
+      letter-spacing: .04em
+    }
+
+    .email-page .status-pill {
+      display: inline-block;
+      border-radius: 20px;
+      padding: 4px 8px;
+      font-size: 10px;
+      font-weight: 700;
+      background: #edf8f0;
+      color: #23733c
+    }
+
+    .email-page .status-pill.failed {
+      background: #fff0ed;
+      color: #bb493b
+    }
+
+    .email-page .status-pill.queued {
+      background: #fff7dd;
+      color: #916900
+    }
+
+    .email-page .status-pill.retry {
+      background: #f1edff;
+      color: #6748a8
+    }
+
+    .email-page .muted {
+      color: #858d99
+    }
+
+    .email-page .hidden {
+      display: none !important
+    }
+
+    .email-page .notice-strip {
+      border: 1px solid #eee2a9;
+      background: #fffbea;
+      border-radius: 9px;
+      padding: 11px 13px;
+      color: #6d5d20;
+      font-size: 11px;
+      margin-bottom: 13px
+    }
+
+    @media(max-width:1000px) {
+      .email-page .field-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .email-page .panel-grid {
+        grid-template-columns: 1fr
+      }
+
+      .email-page .template-layout {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:650px) {
+      .email-page .metric-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .email-page .field-grid,
+      .email-page .event-grid,
+      .email-page .mini-panel .field-grid {
+        grid-template-columns: 1fr
+      }
+
+      .email-page .section-head {
+        align-items: flex-start;
+        flex-direction: column
+      }
+
+      .email-page .section-body {
+        padding: 13px
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav">
+        <a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+        <a href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a>
+        <a href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a>
+        <a href="projects.html"><span class="nav-icon">◈</span><span>Projects</span></a>
+        <a href="contracts.html"><span class="nav-icon">▣</span><span>Contracts</span></a>
+        <a href="support-plans.html"><span class="nav-icon">◇</span><span>Support Plans</span></a>
+        <a href="service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a>
+        <a href="contacts.html"><span class="nav-icon">♧</span><span>Contacts</span></a>
+        <a href="assets.html"><span class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a>
+        <a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a>
+        <a href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles & Access</span></a>
+        <a href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a>
+        <a href="email-notifications.html" class="active"><span class="nav-icon">✉</span><span>Email
+            Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>GP</div>
+        <div><strong data-customer-name>Signed in</strong><small data-customer-email></small><a href="login.html"
+            data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main email-page">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Email Notification Service</h1>
+          <p class="subtitle">SMTP delivery, ticket event rules, templates and delivery monitoring</p>
+        </div>
+        <div class="top-actions"><a class="btn btn-primary" href="tickets.html">Ticket Workspace</a></div>
+      </header>
+      <div class="notice-strip" id="email-page-notice">Email notification settings are managed by Admin. In-app
+        notifications are delivered separately to each user's notification bell. Email timestamps and daily notification
+        scheduling use Myanmar Time (MMT, Asia/Yangon).</div>
+      <div class="metric-grid" id="email-metrics">
+        <div class="metric"><small>Queued</small><strong id="metric-queued">0</strong></div>
+        <div class="metric"><small>Retry / Failed</small><strong id="metric-retry">0</strong></div>
+        <div class="metric"><small>Sent · Today</small><strong id="metric-sent">0</strong></div>
+        <div class="metric"><small>Failed · Today</small><strong id="metric-failed">0</strong></div>
+      </div>
+
+      <section class="section-card admin-only" id="smtp-section">
+        <div class="section-head">
+          <div>
+            <h2><span class="step">1</span>SMTP Settings</h2>
+            <p>Configure the mailbox used to send Ticket notification emails.</p>
+          </div><label class="switch-line"><input id="smtp-enabled" type="checkbox"> Email Service Enabled</label>
+        </div>
+        <div class="section-body">
+          <div class="notice-strip">Recipient policy: Any Valid Email Address · Send only to valid email addresses.
+            External delivery depends on your SMTP provider and account permissions.</div>
+          <div class="panel-grid smtp-layout">
+            <div class="mini-panel">
+              <h3>SMTP Connection</h3>
+              <p class="field-help">Mail server and authentication</p>
+              <div class="field-grid">
+                <div class="field"><label>Email Provider Preset</label><select id="smtp-provider">
+                    <option value="gmail">Gmail</option>
+                    <option value="outlook">Outlook / Microsoft 365</option>
+                    <option value="custom">Custom SMTP</option>
+                  </select></div>
+                <div class="field"><label>SMTP Host</label><input id="smtp-host" placeholder="smtp.gmail.com"></div>
+                <div class="field"><label>SMTP Port</label><input id="smtp-port" type="number" value="587"></div>
+                <div class="field"><label>SMTP Username</label><input id="smtp-username" type="email"
+                    placeholder="mail@example.com"></div>
+                <div class="field"><label>SMTP Password</label><input id="smtp-password" type="password"
+                    placeholder="Configured · leave blank to keep"></div>
+                <div class="field"><label>Authentication</label><select id="smtp-auth">
+                    <option>Username and password</option>
+                    <option>No authentication</option>
+                  </select></div>
+              </div>
+            </div>
+            <div class="mini-panel">
+              <h3>Sender Identity</h3>
+              <p class="field-help">What recipients will see</p>
+              <div class="field-grid">
+                <div class="field"><label>Sender / From Email</label><input id="smtp-from-email" type="email"
+                    placeholder="mail@example.com"></div>
+                <div class="field"><label>From Name</label><input id="smtp-from-name"
+                    value="Golden Pride Ticket System"></div>
+                <div class="field"><label>Reply-To</label><input id="smtp-reply-to" type="email"
+                    placeholder="Optional reply address"></div>
+              </div>
+
+            </div>
+            <div class="mini-panel">
+              <h3>Security & Retry</h3>
+              <p class="field-help">TLS mode and failed delivery retry</p>
+              <div class="smtp-checks"><label><input id="smtp-ssl" type="checkbox"> SSL / TLS direct (usually port
+                  465)</label><label><input id="smtp-starttls" type="checkbox" checked> Require STARTTLS (usually port
+                  587)</label><label><input id="smtp-self-signed" type="checkbox"> Allow self-signed certificate</label>
+              </div>
+              <div class="field-grid smtp-retry-grid">
+                <div class="field"><label>Maximum Retry</label><input id="smtp-max-retry" type="number" min="0" max="10"
+                    value="3"></div>
+                <div class="field"><label>Retry Delay (minutes)</label><input id="smtp-retry-delay" type="number"
+                    min="1" max="1440" value="5"></div>
+                <div class="field"><label>Connection Timeout (seconds)</label><input id="smtp-timeout" type="number"
+                    min="3" max="60" value="15"></div>
+              </div>
+              <p class="field-help smtp-security-warning">Self-signed certificates disable normal certificate
+                verification. Use only with a trusted private mail server.</p>
+            </div>
+          </div>
+          <div class="action-line"><button class="btn-light" id="reset-smtp" type="button">Reset Fields</button><button
+              class="btn-yellow" id="save-smtp" type="button">Save Settings</button></div>
+        </div>
+      </section>
+
+      <div class="panel-grid admin-only" id="test-and-rules">
+        <section class="section-card">
+          <div class="section-head">
+            <div>
+              <h2><span class="step">2</span>Test Email</h2>
+              <p>Confirm SMTP delivery before enabling Ticket notifications.</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="field"><label>Test Recipient</label><input id="test-recipient" type="email"
+                placeholder="admin@company.com"></div>
+            <div class="action-line"><button class="btn-yellow" id="send-test" type="button">Send Test</button></div>
+            <p class="field-help" id="smtp-test-result">Use a real internal or external email address that you can
+              access.</p>
+          </div>
+        </section>
+        <section class="section-card" id="rules-section">
+          <div class="section-head">
+            <div>
+              <h2><span class="step">3</span>Ticket Event Rules</h2>
+              <p>Choose which Ticket events generate email notifications.</p>
+            </div>
+          </div>
+          <div class="section-body">
+            <div class="event-grid" id="email-event-grid"></div>
+            <div class="action-line"><button class="btn-yellow" id="save-rules" type="button">Save Rules</button></div>
+          </div>
+        </section>
+      </div>
+
+      <section class="section-card admin-only" id="automation-timing-section">
+        <div class="section-head">
+          <div>
+            <h2>Automation Timing</h2>
+            <p>Configure the automatic customer reminders and resolved-ticket closing policy.</p>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="field-grid" style="grid-template-columns:repeat(3,minmax(0,1fr));gap:12px">
+            <div class="field">
+              <label for="pending-reminder-value">Pending Customer Reminder</label>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:8px">
+                <input id="pending-reminder-value" type="number" min="1" max="43200" step="1" value="5">
+                <select id="pending-reminder-unit" aria-label="Pending Customer Reminder unit">
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                </select>
+              </div>
+              <small class="field-help">Send once after the ticket has stayed in Pending Customer for the selected
+                duration (maximum 30 days).</small>
+            </div>
+            <div class="field">
+              <label for="resolution-reminder-value">Resolution Confirmation Reminder</label>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:8px">
+                <input id="resolution-reminder-value" type="number" min="1" max="43200" step="1" value="5">
+                <select id="resolution-reminder-unit" aria-label="Resolution Confirmation Reminder unit">
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                </select>
+              </div>
+              <small class="field-help">Send once if the ticket remains Resolved without customer confirmation (maximum
+                30 days).</small>
+            </div>
+            <div class="field">
+              <label for="auto-close-value">Auto Close Resolved Tickets</label>
+              <div style="display:grid;grid-template-columns:minmax(0,1fr) 112px;gap:8px">
+                <input id="auto-close-value" type="number" min="0" max="129600" step="1" value="10">
+                <select id="auto-close-unit" aria-label="Auto Close Resolved Tickets unit">
+                  <option value="minutes">Minutes</option>
+                  <option value="hours">Hours</option>
+                  <option value="days">Days</option>
+                </select>
+              </div>
+              <small class="field-help">Close a ticket after the selected duration in Resolved (maximum 90 days). Set 0
+                to disable automatic closing.</small>
+            </div>
+          </div>
+          <div class="action-line"><button class="btn-yellow" id="save-automation-timing" type="button">Save Automation
+              Timing</button></div>
+        </div>
+      </section>
+
+      <section class="section-card admin-only" id="templates-section">
+        <div class="section-head">
+          <div>
+            <h2><span class="step">4</span>Email Templates</h2>
+            <p>Each event has a separate Admin, Agent and/or Customer template. Choose the recipient role and event
+              below. Variables are replaced when the email is queued.</p>
+          </div>
+        </div>
+        <div class="section-body template-layout">
+          <div>
+            <div class="field"><label>Recipient Role + Ticket Event</label><select id="template-event"></select></div>
+            <div class="field" style="margin-top:12px"><label>Email Subject</label><input id="template-subject"
+                placeholder="[CTS] {{event_label}} - {{ticket_no}}"></div>
+            <div class="field" style="margin-top:12px"><label>Email Body</label><textarea id="template-body" rows="13"
+                style="resize:vertical" placeholder="Dear {{recipient_name}},&#10;&#10;{{event_message}}"></textarea>
+            </div>
+            <div class="action-line"><button class="btn-light" id="reset-template" type="button">Reset
+                Default</button><button class="btn-yellow" id="save-template" type="button">Save Template</button></div>
+          </div>
+          <aside class="mini-panel">
+            <h3>Available Variables</h3>
+            <p class="field-help" style="margin-bottom:12px">Click a variable to insert it at the end of the selected
+              field.</p>
+            <div class="template-vars" id="template-vars"></div>
+            <p class="notice-strip" style="margin-top:14px">Example: {{ticket_no}} becomes the real Ticket No. for each
+              recipient.</p>
+          </aside>
+        </div>
+      </section>
+
+      <section class="section-card admin-only" id="delivery-section">
+        <div class="section-head">
+          <div>
+            <h2><span class="step">5</span>Email Delivery Log</h2>
+            <p>Monitor queued, sent, retry and failed Ticket emails. Browse all delivery records 10 per page.</p>
+          </div>
+          <div class="delivery-tools"><select id="delivery-filter">
+              <option value="all">All Status</option>
+              <option value="queued">Queued</option>
+              <option value="sent">Sent</option>
+              <option value="failed">Failed</option>
+            </select><button class="btn-light" id="process-queue" type="button">Process Queue</button><button
+              class="btn-light" id="retry-failed" type="button">Retry Failed</button><button class="btn-light"
+              id="refresh-delivery" type="button">Refresh</button></div>
+        </div>
+        <div class="section-body table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>Created (Myanmar Time)</th>
+                <th>Ticket</th>
+                <th>Event</th>
+                <th>Recipient</th>
+                <th>Status</th>
+                <th>Attempts</th>
+                <th>Sent (Myanmar Time)</th>
+                <th>Error</th>
+              </tr>
+            </thead>
+            <tbody id="delivery-rows">
+              <tr>
+                <td colspan="8" class="muted">Loading delivery records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot" id="delivery-pagination"><span id="delivery-count">Loading email delivery
+            records…</span>
+          <div class="gp-ticket-page-buttons" id="delivery-page-buttons"></div>
+        </div>
+      </section>
+
+      <section class="section-card" id="personal-preferences" style="display:none">
+        <div class="section-head">
+          <div>
+            <h2>My Email Preferences</h2>
+            <p>Choose which email alerts you want to receive. This does not change your in-app notification rules.</p>
+          </div>
+        </div>
+        <div class="section-body">
+          <div class="event-grid" id="personal-pref-grid"></div>
+          <div class="action-line"><button class="btn-yellow" id="save-personal-prefs" type="button">Save
+              Preferences</button></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · Email and in-app notifications</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

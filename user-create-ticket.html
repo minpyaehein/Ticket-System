@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width,initial-scale=1" name="viewport" />
+    <title>Create Ticket | Golden Pride</title>
+    <link href="css/style.css" rel="stylesheet" />
+</head>
+
+<body>
+    <div class="app">
+        <aside class="sidebar">
+            <a class="brand" href="user-dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+                        Pride</strong><small>Service workspace</small></span></a>
+
+            <nav class="nav">
+                <a href="user-dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+                <a href="my-tickets.html"><span class="nav-icon">▤</span><span>My Tickets</span></a>
+                <a class="active" href="user-create-ticket.html"><span class="nav-icon">＋</span><span>New
+                        Request</span></a>
+                <a href="user-service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a>
+                <a href="user-assets.html"><span class="nav-icon">▧</span><span>My Assets</span></a>
+            </nav>
+            <div class="sidebar-bottom">
+                <div class="avatar" data-customer-avatar="">GP</div>
+                <div><strong data-customer-name="">Signed-in customer</strong><small
+                        data-customer-email="">customer@goldenpride.local</small><a class="logout-link" data-logout=""
+                        href="login.html">Sign out ↗</a></div>
+            </div>
+        </aside>
+        <main class="main">
+            <header class="topbar">
+                <div>
+                    <div class="eyebrow">Golden Pride / Customer portal</div>
+                    <h1>Create Ticket</h1>
+                    <p class="subtitle">Submit an issue or service request to the correct support team</p>
+                </div>
+                <div class="top-actions"><a class="btn" href="my-tickets.html">← Back to my tickets</a></div>
+            </header>
+            <div id="access-notice"></div>
+            <div class="breadcrumb"><a href="my-tickets.html">My Tickets</a> / New ticket</div>
+            <section class="card">
+                <div class="card-head">
+                    <div>
+                        <h2>Ticket information</h2>
+                        <p>Required fields are marked with an asterisk</p>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="notice">Your account details are filled in automatically. Select the service related to
+                        your issue; Golden Pride will route the ticket to the matching support team. You do not need to
+                        choose a team or agent.</div>
+                    <form action="#" method="post">
+                        <div class="form-grid">
+                            <div class="field"><label>Customer</label><input class="input" data-customer-name=""
+                                    readonly="" value="Signed-in customer" /></div>
+                            <div class="field"><label>Customer Email</label><input class="input" data-customer-email=""
+                                    readonly="" value="customer@goldenpride.local" /></div>
+                            <div class="field"><label>Project (optional)</label><select class="select">
+                                    <option value="">Select project (optional)</option>
+                                </select></div>
+                            <div class="field"><label>Contact (optional)</label><select class="select">
+                                    <option value="">Select contact (optional)</option>
+                                </select></div>
+                            <div class="field"><label>Contract (Optional)</label><select class="select">
+                                    <option value="">Select contract (optional)</option>
+                                </select></div>
+                            <div class="field"><label>Support Plan (optional)</label><select class="select">
+                                    <option value="">Select support plan (optional)</option>
+                                </select></div>
+                            <div class="field"><label>Service / Request Type (optional)</label><select class="select">
+                                    <option value="">No Service Catalog item</option>
+                                </select></div>
+                            <div class="field"><label>Request Category *</label><select class="select" required="">
+                                    <option value="">Select request type</option>
+                                    <option value="Incident">Incident</option>
+                                    <option value="Service Request">Service Request</option>
+                                    <option value="Access Request">Access Request</option>
+                                </select></div>
+                            <div class="field"><label>Priority</label><select class="select">
+                                    <option value="Medium">Medium</option>
+                                    <option value="Low">Low</option>
+                                    <option value="High">High</option>
+                                    <option value="Critical">Critical</option>
+                                </select></div>
+                            <div class="field"><label>Related Asset (optional)</label><select class="select">
+                                    <option value="">No asset linked</option>
+                                </select></div>
+                            <div class="field"><label>Ticket Status</label><input class="input" readonly=""
+                                    value="Open" /></div>
+                            <div class="field full"><label>Subject *</label><input class="input" maxlength="240"
+                                    placeholder="Short summary of the error or issue" required="" type="text" /></div>
+                            <div class="field full"><label>Description</label><textarea class="textarea"
+                                    placeholder="Explain what happened, when it started, and any error message you received"
+                                    rows="5"></textarea></div>
+                            <div class="field full"><label>Attachment Reference (Optional)</label><input class="input"
+                                    placeholder="Optional file name or reference" type="text" /></div>
+                        </div>
+                        <div class="form-actions"><a class="btn" href="my-tickets.html">Cancel</a><button
+                                class="btn btn-primary" type="submit">Create ticket</button></div>
+                    </form>
+                </div>
+            </section>
+            <div class="footer">Golden Pride Service Workspace · Customer Portal</div>
+        </main>
+    </div>
+    <script defer="" src="js/app.js"></script>
+</body>
+
+</html>

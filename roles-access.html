@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f6fc">
+  <title>Roles &amp; Access | Golden Pride</title>
+
+  <!-- Keep the main Golden Pride stylesheet and application script. -->
+  <link rel="stylesheet" href="css/style.css">
+
+  <!-- Role & Access styling is built into this page, so no extra CSS file is needed. -->
+  <style>
+    .ra-panel {
+      margin-top: 24px;
+      overflow: hidden;
+      border: 1px solid #e4e9f2;
+      border-radius: 14px;
+      background: #fff;
+      box-shadow: 0 8px 24px rgba(26, 44, 78, .055);
+    }
+
+    .ra-panel-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      padding: 20px 22px;
+      border-bottom: 1px solid #e9edf4;
+    }
+
+    .ra-panel-heading h2 {
+      margin: 0;
+      color: #1b2d4a;
+      font-size: 17px;
+      font-weight: 750;
+    }
+
+    .ra-panel-heading p {
+      margin: 5px 0 0;
+      color: #7886a2;
+      font-size: 12px;
+    }
+
+    .ra-tools {
+      display: flex;
+      align-items: center;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .ra-search {
+      width: min(310px, 100%);
+      min-width: 210px;
+      height: 39px;
+      padding: 0 12px;
+      border: 1px solid #dbe2ed;
+      border-radius: 9px;
+      outline: none;
+      background: #fff;
+      color: #263854;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .ra-search:focus {
+      border-color: #8b80e8;
+      box-shadow: 0 0 0 3px rgba(105, 88, 223, .11);
+    }
+
+    .ra-count {
+      color: #71809a;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .ra-table-scroll {
+      width: 100%;
+      overflow-x: auto;
+    }
+
+    .ra-table {
+      width: 100%;
+      min-width: 760px;
+      border-collapse: collapse;
+      text-align: left;
+    }
+
+    .ra-table thead th {
+      padding: 14px 18px;
+      border-bottom: 1px solid #e7ebf3;
+      background: #f7f8fc;
+      color: #71809a;
+      font-size: 10px;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      white-space: nowrap;
+    }
+
+    .ra-table thead th:first-child {
+      width: 27%;
+    }
+
+    .ra-table tbody th,
+    .ra-table tbody td {
+      padding: 13px 18px;
+      border-bottom: 1px solid #edf0f5;
+      vertical-align: middle;
+      font-size: 12px;
+    }
+
+    .ra-table tbody th {
+      color: #263854;
+      font-weight: 700;
+    }
+
+    .ra-table tbody td {
+      color: #586987;
+    }
+
+    .ra-table tbody tr:hover {
+      background: #fafbff;
+    }
+
+    .ra-table tbody tr:last-child th,
+    .ra-table tbody tr:last-child td {
+      border-bottom: 0;
+    }
+
+    .ra-role-heading {
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+    }
+
+    .ra-role-heading::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .ra-admin {
+      color: #6555d6;
+    }
+
+    .ra-agent {
+      color: #2670b9;
+    }
+
+    .ra-customer {
+      color: #168565;
+    }
+
+    .ra-permission {
+      display: inline-flex;
+      align-items: center;
+      max-width: 100%;
+      min-height: 27px;
+      padding: 5px 9px;
+      border-radius: 7px;
+      font-size: 11px;
+      font-weight: 650;
+      line-height: 1.35;
+    }
+
+    .ra-full {
+      color: #14835b;
+      background: #e7f7f0;
+    }
+
+    .ra-team {
+      color: #2164b5;
+      background: #eaf3ff;
+    }
+
+    .ra-own {
+      color: #946000;
+      background: #fff4d6;
+    }
+
+    .ra-view {
+      color: #586987;
+      background: #eff2fa;
+    }
+
+    .ra-none {
+      color: #bd3e55;
+      background: #ffedf0;
+    }
+
+    .ra-empty td {
+      padding: 28px 18px !important;
+      color: #7886a2 !important;
+      text-align: center;
+    }
+
+    .ra-empty[hidden],
+    .ra-table tr[hidden] {
+      display: none !important;
+    }
+
+    .ra-panel-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      padding: 13px 20px;
+      border-top: 1px solid #e9edf4;
+      background: #fbfcff;
+      color: #8793aa;
+      font-size: 11px;
+    }
+
+    .ra-panel-footer strong {
+      color: #536482;
+    }
+
+    @media (max-width: 760px) {
+      .ra-panel-heading {
+        align-items: stretch;
+        flex-direction: column;
+        padding: 17px;
+      }
+
+      .ra-tools {
+        justify-content: space-between;
+      }
+
+      .ra-search {
+        width: 100%;
+        min-width: 0;
+      }
+
+      .ra-table thead th,
+      .ra-table tbody th,
+      .ra-table tbody td {
+        padding-left: 13px;
+        padding-right: 13px;
+      }
+
+      .ra-panel-footer {
+        align-items: flex-start;
+        flex-direction: column;
+        padding: 12px 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html">
+        <span class="brand-mark">G</span>
+        <span><strong>Golden Pride</strong><small>Service workspace</small></span>
+      </a>
+
+      <nav class="nav">
+        <a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+        <a href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a>
+        <a href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a>
+        <a href="projects.html"><span class="nav-icon">◈</span><span>Projects</span></a>
+        <a href="contracts.html"><span class="nav-icon">▣</span><span>Contracts</span></a>
+        <a href="support-plans.html"><span class="nav-icon">◇</span><span>Support Plans</span></a>
+        <a href="service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a>
+        <a href="contacts.html"><span class="nav-icon">♧</span><span>Contacts</span></a>
+        <a href="assets.html"><span class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a>
+        <a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a>
+        <a href="roles-access.html" class="active" aria-current="page"><span class="nav-icon">⚿</span><span>Roles &amp;
+            Access</span></a>
+        <a href="audit-log.html"><span class="nav-icon">≋</span><span>Audit Log</span></a>
+        <a href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div>
+          <strong data-customer-name>System Administrator</strong>
+          <small data-customer-email>admin@goldenpride.local</small>
+          <a href="login.html" data-logout class="logout-link">Sign out ↗</a>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Roles &amp; Access</h1>
+          <p class="subtitle">View role permissions and access levels across the Golden Pride workspace</p>
+        </div>
+        <div class="top-actions">
+
+        </div>
+      </header>
+
+      <!-- One permission dashboard only: 14 modules and the three role columns. -->
+      <section class="ra-panel" aria-labelledby="rolePermissionTitle">
+        <div class="ra-panel-heading">
+          <div>
+            <h2 id="rolePermissionTitle">Role Permission Dashboard</h2>
+            <p>Compare what Admin, Agent and Customer can access in each module.</p>
+          </div>
+          <div class="ra-tools">
+            <input id="permissionSearch" class="ra-search" type="search" placeholder="Search modules or permissions..."
+              aria-label="Search role permissions" autocomplete="off">
+            <span class="ra-count" id="permissionCount" aria-live="polite">14 modules</span>
+          </div>
+        </div>
+
+        <div class="ra-table-scroll">
+          <table class="ra-table">
+            <thead>
+              <tr>
+                <th scope="col">Module</th>
+                <th scope="col"><span class="ra-role-heading ra-admin">Admin</span></th>
+                <th scope="col"><span class="ra-role-heading ra-agent">Agent</span></th>
+                <th scope="col"><span class="ra-role-heading ra-customer">Customer</span></th>
+              </tr>
+            </thead>
+            <tbody id="permissionRows">
+              <tr data-module>
+                <th scope="row">Dashboard</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">Team Dashboard</span></td>
+                <td><span class="ra-permission ra-own">Own Dashboard</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Tickets</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">Team View / Assigned Management</span></td>
+                <td><span class="ra-permission ra-own">Own Tickets</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Customers</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-view">View</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Projects</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">Assigned Projects</span></td>
+                <td><span class="ra-permission ra-own">Own Projects</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Contracts</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">Linked Contracts</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Support Plans</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-view">View</span></td>
+                <td><span class="ra-permission ra-own">Own Plan</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Service Catalog</th>
+                <td><span class="ra-permission ra-full">Manage</span></td>
+                <td><span class="ra-permission ra-view">View</span></td>
+                <td><span class="ra-permission ra-own">Customer-visible</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Contacts</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">Linked Contacts</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Assets</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-team">View / Link</span></td>
+                <td><span class="ra-permission ra-own">Own Assets</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">User Management</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Teams</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Role &amp; Access</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Email Notifications</th>
+                <td><span class="ra-permission ra-full">Configure</span></td>
+                <td><span class="ra-permission ra-team">Receive Relevant Emails</span></td>
+                <td><span class="ra-permission ra-own">Receive Own Ticket Emails</span></td>
+              </tr>
+              <tr data-module>
+                <th scope="row">Audit Log</th>
+                <td><span class="ra-permission ra-full">Full</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+                <td><span class="ra-permission ra-none">No Access</span></td>
+              </tr>
+              <tr class="ra-empty" id="permissionEmpty" hidden>
+                <td colspan="4">No modules match your search.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="ra-panel-footer">
+          <span>Showing <strong id="visibleCount">14</strong> of 14 modules</span>
+          <span>Access descriptions are a role-permission reference.</span>
+        </div>
+      </section>
+
+      <div class="footer">Golden Pride Service Workspace · Role &amp; Access Overview</div>
+    </main>
+  </div>
+
+
+  <script src="js/app.js" defer></script>
+
+
+  <script>
+    (() => {
+      "use strict";
+      const search = document.getElementById("permissionSearch");
+      const body = document.getElementById("permissionRows");
+      const visibleCount = document.getElementById("visibleCount");
+      const countLabel = document.getElementById("permissionCount");
+      const emptyState = document.getElementById("permissionEmpty");
+      if (!search || !body || !visibleCount || !countLabel || !emptyState) return;
+
+      const rows = Array.from(body.querySelectorAll("tr[data-module]"));
+      const total = rows.length;
+
+      function filterRows() {
+        const query = search.value.trim().toLocaleLowerCase();
+        let visible = 0;
+        rows.forEach((row) => {
+          const matches = row.textContent.toLocaleLowerCase().includes(query);
+          row.hidden = !matches;
+          if (matches) visible += 1;
+        });
+        emptyState.hidden = visible !== 0;
+        visibleCount.textContent = String(visible);
+        countLabel.textContent = `${visible} of ${total} modules`;
+      }
+
+      search.addEventListener("input", filterRows);
+      document.addEventListener("keydown", (event) => {
+        if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
+          event.preventDefault();
+          search.focus();
+          search.select();
+        }
+      });
+      filterRows();
+    })();
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Tickets | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html" class="active"><span class="nav-icon">▤</span><span>Tickets</span></a><a
+          href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Tickets</h1>
+          <p class="subtitle">Manage customer requests linked to projects, contracts and support plans</p>
+        </div>
+        <div class="top-actions">
+        </div>
+      </header>
+      <section class="card">
+        <div class="filters">
+          <div class="filter-grid">
+            <div class="field span-2"><label>Search</label><input class="input" type="text"
+                placeholder="Ticket, customer, project or contract" value=""></div>
+            <div class="field "><label>Ticket view</label><select class="select">
+                <option>All Tickets</option>
+                <option>My Tickets</option>
+                <option>Unassigned</option>
+                <option>SLA at Risk</option>
+              </select></div>
+            <div class="field "><label>Customer</label><select class="select">
+                <option>All Customers</option>
+                <option>Nova Manufacturing</option>
+                <option>Summit Trading</option>
+                <option>Orchid Healthcare</option>
+              </select></div>
+            <div class="field "><label>Project</label><select class="select">
+                <option>All Projects</option>
+                <option>General Support Project</option>
+                <option>ERP Modernization</option>
+                <option>Infrastructure</option>
+              </select></div>
+            <div class="field "><label>Contract</label><select class="select">
+                <option>All Contracts</option>
+                <option>AUTO-2-SUPPORT</option>
+                <option>ERP-CARE</option>
+                <option>INFRA-STD</option>
+              </select></div>
+            <div class="field "><label>Request type</label><select class="select">
+                <option>All Request Types</option>
+                <option>Database Support</option>
+                <option>Application Support</option>
+                <option>Hardware</option>
+                <option>Access Request</option>
+              </select></div>
+            <div class="field "><label>Status</label><select class="select">
+                <option>All Status</option>
+                <option>Open</option>
+                <option>In progress</option>
+                <option>Pending customer</option>
+                <option>Resolved</option>
+                <option>Closed</option>
+              </select></div>
+            <div class="field "><label>From date</label><input class="input" type="date" placeholder=""
+                value="2026-10-01"></div>
+            <div class="field "><label>To date</label><input class="input" type="date" placeholder=""
+                value="2026-10-22"></div>
+          </div>
+          <div class="filter-actions" style="margin-top:14px"><button class="btn btn-primary" type="submit">Search
+              tickets</button><a class="btn" href="tickets.html">Reset</a></div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Ticket register</h2>
+            <p>Track customer requests, ownership and priority · Newest first · 10 tickets per page</p>
+          </div>
+          <div class="inline"><a class="btn btn-sm" href="#">Export CSV</a><a class="btn btn-primary btn-sm"
+              href="add-ticket.html">+ Add ticket</a></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>Ticket</th>
+                <th>Customer / Project</th>
+                <th>Contract / Plan</th>
+                <th>Request type</th>
+                <th>Subject</th>
+                <th>Status</th>
+                <th>Asset</th>
+                <th>Support Team</th>
+                <th>Assigned</th>
+                <th>Created</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-007</a></td>
+                <td>Nova Manufacturing<span class="sub-cell">General Support Project</span></td>
+                <td>AUTO-2-SUPPORT<span class="sub-cell">Standard plan</span></td>
+                <td>Database Support</td>
+                <td>Database connection timeout</td>
+                <td><span class="badge closed">Closed</span></td>
+                <td>DB-SRV-014</td>
+                <td>Support Engineer</td>
+                <td>10/19/2026</td>
+                <td><a class="btn btn-sm" href="ticket-detail.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-006</a></td>
+                <td>Summit Trading<span class="sub-cell">ERP Modernization</span></td>
+                <td>ERP-CARE</td>
+                <td>Application Support</td>
+                <td>customer access request</td>
+                <td><span class="badge progress">In progress</span></td>
+                <td>LAP-0042</td>
+                <td>Aye Aye</td>
+                <td>10/22/2026</td>
+                <td><a class="btn btn-sm" href="ticket-detail.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-005</a></td>
+                <td>Orchid Healthcare<span class="sub-cell">Infrastructure</span></td>
+                <td>INFRA-STD</td>
+                <td>Hardware</td>
+                <td>Workstation setup</td>
+                <td><span class="badge open">Open</span></td>
+                <td>PC-0091</td>
+                <td>Unassigned</td>
+                <td>10/22/2026</td>
+                <td><a class="btn btn-sm" href="ticket-detail.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="ticket-detail.html">TKT-2026-004</a></td>
+                <td>Nova Manufacturing</td>
+                <td>AUTO-2-SUPPORT</td>
+                <td>Network</td>
+                <td>VPN connectivity issue</td>
+                <td><span class="badge progress">In progress</span></td>
+                <td>RTR-0007</td>
+                <td>Support Engineer</td>
+                <td>10/21/2026</td>
+                <td><a class="btn btn-sm" href="ticket-detail.html">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span>Showing 1–4 of 24 tickets</span>
+          <div class="pagination"><a class="current" href="tickets.html">1</a><a href="tickets.html">2</a><a
+              href="tickets.html">3</a><a href="tickets.html">Next →</a></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

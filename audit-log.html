@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Audit Log | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    .audit-filter-grid {
+      display: grid;
+      grid-template-columns: minmax(230px, 1.7fr) minmax(145px, 1fr) minmax(145px, 1fr) minmax(150px, 1fr) minmax(150px, 1fr);
+      gap: 10px;
+      align-items: end
+    }
+
+    .audit-filter-grid .field {
+      margin: 0;
+      min-width: 0
+    }
+
+    .audit-filter-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      margin-top: 12px;
+      flex-wrap: wrap
+    }
+
+    .audit-table td {
+      vertical-align: middle
+    }
+
+    .audit-table .sub-cell {
+      display: block;
+      color: #728094;
+      font-size: 11px;
+      margin-top: 3px
+    }
+
+    .audit-summary {
+      min-width: 260px;
+      white-space: normal;
+      line-height: 1.45
+    }
+
+    .audit-user {
+      min-width: 145px
+    }
+
+    .audit-entity {
+      min-width: 125px
+    }
+
+    .audit-date {
+      white-space: nowrap;
+      min-width: 150px
+    }
+
+    .audit-details {
+      white-space: nowrap
+    }
+
+    .audit-action-pill {
+      display: inline-flex;
+      border-radius: 99px;
+      background: #eef1f5;
+      padding: 5px 9px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #34445a;
+      white-space: nowrap
+    }
+
+    .audit-changes-dialog {
+      border: 0;
+      border-radius: 14px;
+      padding: 0;
+      width: min(760px, calc(100vw - 28px));
+      max-height: 84vh;
+      box-shadow: 0 20px 80px #17203345
+    }
+
+    .audit-changes-dialog::backdrop {
+      background: #0b172b75
+    }
+
+    .audit-dialog-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 22px;
+      border-bottom: 1px solid #e5eaf1
+    }
+
+    .audit-dialog-body {
+      padding: 18px 22px;
+      overflow: auto
+    }
+
+    .audit-change-grid {
+      width: 100%;
+      border-collapse: collapse
+    }
+
+    .audit-change-grid th,
+    .audit-change-grid td {
+      padding: 10px;
+      border-bottom: 1px solid #e5eaf1;
+      text-align: left;
+      font-size: 12px;
+      vertical-align: top;
+      overflow-wrap: anywhere
+    }
+
+    .audit-change-grid th {
+      background: #f6f8fb;
+      color: #5b687d
+    }
+
+    .audit-empty {
+      padding: 22px;
+      text-align: center;
+      color: #718096
+    }
+
+    @media(max-width:1050px) {
+      .audit-filter-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr))
+      }
+
+      .audit-filter-grid .field:first-child {
+        grid-column: 1/-1
+      }
+    }
+
+    @media(max-width:620px) {
+      .audit-filter-grid {
+        grid-template-columns: 1fr
+      }
+
+      .audit-filter-grid .field:first-child {
+        grid-column: auto
+      }
+
+      .audit-filter-actions>* {
+        flex: 1
+      }
+
+      .audit-date {
+        white-space: normal
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+      <nav class="nav">
+        <a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a>
+        <a href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a>
+        <a href="customers.html"><span class="nav-icon">♙</span><span>Customers</span></a>
+        <a href="projects.html"><span class="nav-icon">◈</span><span>Projects</span></a>
+        <a href="contracts.html"><span class="nav-icon">▣</span><span>Contracts</span></a>
+        <a href="support-plans.html"><span class="nav-icon">◇</span><span>Support Plans</span></a>
+        <a href="service-catalog.html"><span class="nav-icon">☷</span><span>Service Catalog</span></a>
+        <a href="contacts.html"><span class="nav-icon">♧</span><span>Contacts</span></a>
+        <a href="assets.html"><span class="nav-icon">▧</span><span>Assets</span></a>
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a>
+        <a href="teams.html"><span class="nav-icon">♧</span><span>Teams</span></a>
+        <a href="roles-access.html"><span class="nav-icon">⚿</span><span>Roles &amp; Access</span></a>
+        <a href="audit-log.html" class="active"><span class="nav-icon">≋</span><span>Audit Log</span></a>
+        <a href="email-notifications.html"><span class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Audit Log</h1>
+          <p class="subtitle">Administrative change and security activity trail</p>
+        </div>
+        <div class="top-actions">
+
+        </div>
+      </header>
+      <section class="card">
+        <form id="audit-filter-form" class="card-body" style="padding:14px">
+          <div class="audit-filter-grid">
+            <div class="field"><label for="audit-search">Search user, summary or entity ID</label><input
+                id="audit-search" class="input" type="search" placeholder="Search user, summary or entity ID"></div>
+            <div class="field"><label for="audit-action">Action</label><select id="audit-action" class="select">
+                <option value="">All Actions</option>
+              </select></div>
+            <div class="field"><label for="audit-entity">Entity</label><select id="audit-entity" class="select">
+                <option value="">All Entities</option>
+                <option>tickets</option>
+                <option>customers</option>
+                <option>users</option>
+                <option>projects</option>
+                <option>assets</option>
+                <option>plans</option>
+                <option>services</option>
+                <option>Authentication</option>
+                <option>Email notifications</option>
+              </select></div>
+            <div class="field"><label for="audit-from">From date</label><input id="audit-from" class="input"
+                type="date"></div>
+            <div class="field"><label for="audit-to">To date</label><input id="audit-to" class="input" type="date">
+            </div>
+          </div>
+          <div class="audit-filter-actions"><button class="btn btn-primary" type="submit">Apply</button><button
+              class="btn" id="audit-clear" type="button">Clear Filter</button></div>
+        </form>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Activity history</h2>
+            <p>Who changed what, where it happened, and the before/after values</p>
+          </div><button id="audit-export" class="btn btn-sm" type="button">Export CSV</button>
+        </div>
+        <div class="table-wrap">
+          <table class="audit-table">
+            <thead>
+              <tr>
+                <th>Date</th>
+                <th>User</th>
+                <th>Action</th>
+                <th>Entity</th>
+                <th>Summary</th>
+                <th>IP</th>
+                <th>Details</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td colspan="7" class="audit-empty">Loading audit records…</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span id="audit-count">Loading audit records…</span>
+          <div class="pagination" aria-label="Audit log pagination"></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · Audit records are read-only</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

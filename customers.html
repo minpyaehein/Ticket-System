@@ -1,0 +1,131 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Customers | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"
+          class="active"><span class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a><a href="users.html"><span
+            class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a></nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small
+            data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign
+            out ↗</a></div>
+      </div>
+    </aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Customers</h1>
+          <p class="subtitle">Manage customer organizations and their service relationships</p>
+        </div>
+        <div class="top-actions">
+
+
+        </div>
+      </header>
+      <section class="card">
+        <div class="filters">
+          <div class="filter-grid">
+            <div class="field span-2"><label>Search</label><input class="input" type="text"
+                placeholder="Customer name or email" value=""></div>
+            <div class="field "><label>Status</label><select class="select">
+                <option>All statuses</option>
+                <option>Active</option>
+                <option>Inactive</option>
+                <option>Review</option>
+              </select></div>
+          </div>
+          <div class="filter-actions" style="margin-top:14px"><button class="btn btn-primary"
+              type="submit">Search</button><a class="btn" href="tickets.html">Reset</a></div>
+        </div>
+      </section>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Customers register</h2>
+            <p>Manage records and view related details</p>
+          </div>
+          <div class="inline"><a class="btn btn-sm" href="#">Export</a><a class="btn btn-primary btn-sm"
+              href="add-customer.html?record=customer">+ Add customer</a></div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>COMPANY</th>
+                <th>PRIMARY CONTACT</th>
+                <th>PROJECTS</th>
+                <th>CONTRACTS</th>
+                <th>TICKETS </th>
+                <th>STATUS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Nova Manufacturing</a></td>
+                <td>Thura Aung</td>
+                <td>2</td>
+                <td>3</td>
+                <td>1</td>
+                <td><span class="badge closed">Active</span></td>
+                <td><a class="btn btn-sm" href="customer-detail.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Summit Trading</a></td>
+                <td>May Thu</td>
+                <td>7</td>
+                <td>2</td>
+                <td>5</td>
+                <td><span class="badge closed">Active</span></td>
+                <td><a class="btn btn-sm" href="customer-detail.html">View</a></td>
+              </tr>
+              <tr>
+                <td><a class="ticket-id" href="customer-detail.html">Orchid Healthcare</a></td>
+                <td>Hnin Pwint</td>
+                <td>4</td>
+                <td>1</td>
+                <td>4</td>
+                <td><span class="badge open">Review</span></td>
+                <td><a class="btn btn-sm" href="customer-detail.html">View</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="table-foot"><span>Loading records…</span>
+          <div class="pagination"><a class="current" href="customers.html">1</a><a href="customers.html">2</a><a
+              href="customers.html">Next →</a></div>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+  <script src="js/app.js" defer></script>
+</body>
+
+</html>

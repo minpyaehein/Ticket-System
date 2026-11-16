@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Create role | Golden Pride</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <a class="brand" href="dashboard.html"><span class="brand-mark">G</span><span><strong>Golden
+            Pride</strong><small>Service workspace</small></span></a>
+
+      <nav class="nav"><a href="dashboard.html"><span class="nav-icon">▦</span><span>Dashboard</span></a><a
+          href="tickets.html"><span class="nav-icon">▤</span><span>Tickets</span></a><a href="customers.html"><span
+            class="nav-icon">♙</span><span>Customers</span></a><a href="projects.html"><span
+            class="nav-icon">◈</span><span>Projects</span></a><a href="contracts.html"><span
+            class="nav-icon">▣</span><span>Contracts</span></a><a href="support-plans.html"><span
+            class="nav-icon">◇</span><span>Support Plans</span></a><a href="service-catalog.html"><span
+            class="nav-icon">☷</span><span>Service Catalog</span></a><a href="contacts.html"><span
+            class="nav-icon">♧</span><span>Contacts</span></a><a href="assets.html"><span
+            class="nav-icon">▧</span><span>Assets</span></a>
+
+        <a href="users.html"><span class="nav-icon">♟</span><span>User Management</span></a><a href="teams.html"><span
+            class="nav-icon">♧</span><span>Teams</span></a><a href="roles-access.html" class="active"><span
+            class="nav-icon">⚿</span><span>Roles & Access</span></a><a href="audit-log.html"><span
+            class="nav-icon">≋</span><span>Audit Log</span></a><a href="email-notifications.html"><span
+            class="nav-icon">✉</span><span>Email Notifications</span></a>
+      </nav>
+      <div class="sidebar-bottom">
+        <div class="avatar" data-customer-avatar>SA</div>
+        <div><strong data-customer-name>System Administrator</strong><small data-customer-email>admin@goldenpride.local</small><a href="login.html" data-logout class="logout-link">Sign out ↗</a></div>
+      </div>
+</aside>
+    <main class="main">
+      <header class="topbar">
+        <div>
+          <div class="eyebrow">Golden Pride / Service Desk</div>
+          <h1>Role permissions</h1>
+          <p class="subtitle">Define a permission set for workspace users</p>
+        </div>
+        <div class="top-actions">
+          <form action="tickets.html" method="get" class="compact-search">
+            <input type="search" name="q" placeholder="Search..." aria-label="Search tickets and customers">
+            <button type="submit" aria-label="Search">⌕</button>
+          </form>
+        </div>
+      </header>
+      <div class="breadcrumb"><a href="roles-access.html">Roles & Access</a> / Role permissions</div>
+      <section class="card">
+        <div class="card-head">
+          <div>
+            <h2>Built-in role permissions</h2>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="notice">Use the Roles & Access dashboard to compare Admin, Agent and customer. These checkboxes are
+            illustrative only.</div>
+          <form action="#" method="get">
+            <div class="form-grid">
+              <div class="field "><label>Role name *</label><input class="input" type="text" placeholder="Role name"
+                  value=""></div>
+              <div class="field full"><label>Description</label><input class="input" type="text"
+                  placeholder="What this role is for" value=""></div>
+              <div class="field full"><label>MODULE PERMISSIONS</label>
+                <div class="table-wrap">
+                  <table>
+                    <thead>
+                      <tr>
+                        <th>Module</th>
+                        <th>View</th>
+                        <th>Create</th>
+                        <th>Edit</th>
+                        <th>Deactivate</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td>Tickets</td>
+                        <td><input type="checkbox" checked aria-label="Tickets permission"></td>
+                        <td><input type="checkbox" checked aria-label="Tickets permission"></td>
+                        <td><input type="checkbox" checked aria-label="Tickets permission"></td>
+                        <td><input type="checkbox" aria-label="Tickets permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Customers</td>
+                        <td><input type="checkbox" checked aria-label="Customers permission"></td>
+                        <td><input type="checkbox" checked aria-label="Customers permission"></td>
+                        <td><input type="checkbox" aria-label="Customers permission"></td>
+                        <td><input type="checkbox" aria-label="Customers permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Projects</td>
+                        <td><input type="checkbox" checked aria-label="Projects permission"></td>
+                        <td><input type="checkbox" checked aria-label="Projects permission"></td>
+                        <td><input type="checkbox" aria-label="Projects permission"></td>
+                        <td><input type="checkbox" aria-label="Projects permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Contracts</td>
+                        <td><input type="checkbox" checked aria-label="Contracts permission"></td>
+                        <td><input type="checkbox" checked aria-label="Contracts permission"></td>
+                        <td><input type="checkbox" aria-label="Contracts permission"></td>
+                        <td><input type="checkbox" aria-label="Contracts permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Assets</td>
+                        <td><input type="checkbox" checked aria-label="Assets permission"></td>
+                        <td><input type="checkbox" checked aria-label="Assets permission"></td>
+                        <td><input type="checkbox" aria-label="Assets permission"></td>
+                        <td><input type="checkbox" aria-label="Assets permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Users</td>
+                        <td><input type="checkbox" checked aria-label="Users permission"></td>
+                        <td><input type="checkbox" checked aria-label="Users permission"></td>
+                        <td><input type="checkbox" aria-label="Users permission"></td>
+                        <td><input type="checkbox" aria-label="Users permission"></td>
+                      </tr>
+                      <tr>
+                        <td>Email notifications</td>
+                        <td><input type="checkbox" checked aria-label="Email notifications permission"></td>
+                        <td><input type="checkbox" checked aria-label="Email notifications permission"></td>
+                        <td><input type="checkbox" aria-label="Email notifications permission"></td>
+                        <td><input type="checkbox" aria-label="Email notifications permission"></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+            <div class="form-actions"><a class="btn" href="roles-access.html">Cancel</a><button class="btn btn-primary"
+                type="submit">Save permissions</button></div>
+            <div class="inline" style="margin-top:14px"><a class="btn" href="role-admin.html">Admin details</a></div>
+          </form>
+        </div>
+      </section>
+      <div class="footer">Golden Pride Service Workspace · UI prototype · HTML & CSS</div>
+    </main>
+  </div>
+<script src="js/app.js" defer></script></body>
+
+</html>
