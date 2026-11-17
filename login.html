@@ -33,11 +33,15 @@
         <div id="login-error" class="login-alert" role="alert">The username or password is incorrect.</div>
         <form id="login-form">
           <div class="field"><label for="username">Email / username</label><input class="input" id="username"
-              name="username" autocomplete="username" placeholder="you@goldenpride.local" required></div>
+              name="username" autocomplete="username" placeholder="admin or you@example.com" required></div>
           <div class="field"><label for="password">Password</label><input class="input" id="password" name="password"
               type="password" autocomplete="current-password" placeholder="Enter your password" required></div>
           <button class="btn btn-primary" type="submit">Sign in →</button>
         </form>
+        <p class="login-sub" style="margin-top:18px">First-time Admin setup: after starting the server, open
+          <strong>.golden_pride_private/initial_admin_credentials.txt</strong> in the folder containing
+          <strong>golden_pride_ticket_system</strong>. Sign in with username <strong>admin</strong> and the generated
+          temporary password. You will be required to choose your own password.</p>
 
       </div>
     </section>

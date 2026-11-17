@@ -706,6 +706,62 @@
     teamSelect?.addEventListener('change', sync);
     sync();
   }
+  function setupPrimaryContactRule() {
+    if (file !== 'add-contact.html') return;
+    const form = getMainForm();
+    if (!form) return;
+    const fields = [...form.querySelectorAll('.field')];
+    const customerSelect = fields.find(field => labelForField(field) === 'customer')?.querySelector('select');
+    const typeField = fields.find(field => labelForField(field) === 'type');
+    const typeSelect = typeField?.querySelector('select');
+    if (!customerSelect || !typeSelect) return;
+
+    const allContacts = Array.isArray(lookupData.allContacts) ? lookupData.allContacts : (lookupData.contacts || []);
+    const isPrimary = row => String(row.type || '').trim().toLowerCase() === 'primary contact';
+    const primaryOption = [...typeSelect.options].find(option =>
+      String(option.value || option.textContent).trim().toLowerCase() === 'primary contact'
+    );
+    if (!primaryOption) return;
+
+    let note = typeField.querySelector('[data-primary-contact-note]');
+    if (!note) {
+      note = document.createElement('small');
+      note.dataset.primaryContactNote = '';
+      note.style.display = 'block';
+      note.style.marginTop = '6px';
+      note.style.color = '#a45a14';
+      typeField.appendChild(note);
+    }
+
+    const sync = () => {
+      const customerId = String(customerSelect.value || '');
+      const currentId = String(idParam || '');
+      const current = allContacts.find(row => String(row.contact_id) === currentId);
+      const currentIsThisCustomerPrimary = Boolean(
+        current && String(current.customer_id) === customerId && isPrimary(current)
+      );
+      const hasOtherPrimary = allContacts.some(row =>
+        String(row.customer_id) === customerId && isPrimary(row) && String(row.contact_id) !== currentId
+      );
+      const blocked = Boolean(customerId && hasOtherPrimary && !currentIsThisCustomerPrimary);
+
+      primaryOption.disabled = blocked;
+      primaryOption.textContent = blocked ? 'Primary contact (already assigned)' : 'Primary contact';
+      if (blocked && String(typeSelect.value || '').trim().toLowerCase() === 'primary contact') {
+        const alternative = [...typeSelect.options].find(option =>
+          option.value && String(option.value || option.textContent).trim().toLowerCase() !== 'primary contact'
+        );
+        typeSelect.value = alternative ? alternative.value : '';
+      }
+      note.textContent = blocked ? 'This customer already has a Primary Contact. Select another contact type.' : '';
+      note.hidden = !blocked;
+    };
+
+    customerSelect.addEventListener('change', sync);
+    typeSelect.addEventListener('change', sync);
+    sync();
+  }
+
   function getMainForm() {
     return [...document.querySelectorAll('form')].find(f => !f.classList.contains('compact-search') && !f.classList.contains('filter-grid') && !f.querySelector('input[type="search"]')) || null;
   }
@@ -1390,26 +1446,32 @@
     };
     return specs[resource] || [];
   }
-  function filterValue(row, key) {
-    if (key === 'customer_active') return row.active === false ? 'Deactivated' : 'Active';
-    if (key === 'active') return row.active === false ? 'Deactivated' : 'Active';
-    if (key === 'customer_visible') return row.customer_visible ? 'Yes' : 'No';
-    if (key === 'auto_assign') return row.auto_assign ? 'Enabled' : 'Disabled';
+  const filterText = value => String(value ?? '').trim().toLowerCase().replace(/[_-]+/g, ' ').replace(/\s+/g, ' ');
+  const filterFlag = value => {
+    if (value === true || value === 1) return true;
+    if (value === false || value === 0 || value == null) return false;
+    return ['true', '1', 'yes', 'enabled', 'active'].includes(filterText(value));
+  };
+  function filterValue(row, key, resource) {
+    if (key === 'customer_active' || key === 'active') return filterFlag(row.active) ? 'Active' : 'Deactivated';
+    if (key === 'customer_visible') return filterFlag(row.customer_visible) ? 'Yes' : 'No';
+    if (key === 'auto_assign') return filterFlag(row.auto_assign) ? 'Enabled' : 'Disabled';
     if (key === 'contract_filter') return row.contract_code || row.contract_name || '';
+    if (resource === 'contracts' && key === 'status') return row.status || (filterFlag(row.active) ? 'Active' : 'Deactivated');
     return row[key] ?? '';
   }
   function applyRegisterFilters(resource, rows, values) {
-    const query = String(values.search || '').trim().toLowerCase();
+    const query = filterText(values.search);
     const from = values.from || '', to = values.to || '';
     return rows.filter(row => {
-      if (query && !JSON.stringify(row).toLowerCase().includes(query)) return false;
+      if (query && !filterText(JSON.stringify(row)).includes(query)) return false;
       for (const [key, value] of Object.entries(values)) {
-        if (['search', 'from', 'to'].includes(key) || !value) continue;
-        const expected = String(value).trim().toLowerCase();
+        if (['search', 'from', 'to'].includes(key) || value == null || value === '') continue;
+        const expected = filterText(value);
         if (key === 'ticket_view') {
-          const assigned = String(row.assigned || '').trim().toLowerCase();
-          const status = String(row.status || '').trim().toLowerCase();
-          if (expected === 'my tickets' && assigned !== String(currentUser?.fullname || '').trim().toLowerCase()) return false;
+          const assigned = filterText(row.assigned);
+          const status = filterText(row.status);
+          if (expected === 'my tickets' && assigned !== filterText(currentUser?.fullname)) return false;
           if (expected === 'unassigned' && assigned && assigned !== 'unassigned' && assigned !== '—') return false;
           if (expected === 'sla at risk') {
             if (!row.due_date || ['resolved', 'closed'].includes(status)) return false;
@@ -1418,10 +1480,15 @@
           }
           continue;
         }
-        const actual = String(filterValue(row, key)).trim().toLowerCase();
-        if (key === 'service_names' ? !actual.split(',').map(v => v.trim()).includes(expected) : actual !== expected) return false;
+        const rawActual = filterValue(row, key, resource);
+        const actualValues = Array.isArray(rawActual)
+          ? rawActual.map(filterText)
+          : (key === 'service_names' ? String(rawActual ?? '').split(',').map(filterText) : [filterText(rawActual)]);
+        if (!actualValues.includes(expected)) return false;
       }
       if (from || to) {
+        // Keep the register's existing date-range meaning: both bounds apply
+        // to the record's primary date (Contract Start Date for contracts).
         const raw = String(row.date || row.start_date || row.created_at || '').slice(0, 10);
         if (!raw || (from && raw < from) || (to && raw > to)) return false;
       }
@@ -1436,7 +1503,7 @@
     document.querySelectorAll('.filters').forEach(panel => panel.closest('section.card')?.remove());
     document.querySelectorAll('.gp-user-role-tabs').forEach(tabs => tabs.remove());
     const section = document.createElement('section'); section.className = 'card gp-register-filter-card';
-    const panel = document.createElement('div'); panel.className = 'filters';
+    const panel = document.createElement('form'); panel.className = 'filters'; panel.style.margin = '0';
     const grid = document.createElement('div'); grid.className = 'filter-grid gp-register-filter-grid';
     const addField = (label, key, type = 'select') => {
       const field = document.createElement('div'); field.className = 'field';
@@ -1446,7 +1513,7 @@
       else if (type === 'date') { control = document.createElement('input'); control.type = 'date'; control.className = 'input'; }
       else {
         control = document.createElement('select'); control.className = 'select'; const blank = document.createElement('option'); blank.value = ''; blank.textContent = `All ${label.toLowerCase()}`; control.appendChild(blank);
-        const rawValues = key === 'ticket_view' ? ['My Tickets', 'Unassigned', 'SLA at Risk'] : key === 'service_names' ? rows.flatMap(r => String(r.service_names || '').split(',').map(v => v.trim()).filter(Boolean)) : rows.map(r => String(filterValue(r, key) ?? '').trim()).filter(Boolean);
+        const rawValues = key === 'ticket_view' ? ['My Tickets', 'Unassigned', 'SLA at Risk'] : key === 'service_names' ? rows.flatMap(r => String(r.service_names || '').split(',').map(v => v.trim()).filter(Boolean)) : rows.map(r => String(filterValue(r, key, resource) ?? '').trim()).filter(Boolean);
         const values = [...new Set(rawValues)].sort((a, b) => a.localeCompare(b));
         values.forEach(value => { const option = document.createElement('option'); option.value = value; option.textContent = value; control.appendChild(option); });
       }
@@ -1458,7 +1525,7 @@
       addField('From Date', 'from', 'date'); addField('To Date', 'to', 'date');
     }
     const actions = document.createElement('div'); actions.className = 'filter-actions'; actions.style.marginTop = '14px';
-    const apply = document.createElement('button'); apply.type = 'submit'; apply.className = 'btn btn-primary'; apply.textContent = 'Apply Filters';
+    const apply = document.createElement('button'); apply.type = 'button'; apply.className = 'btn btn-primary'; apply.textContent = 'Apply Filters'; apply.dataset.applyRegisterFilters = '';
     const reset = document.createElement('button'); reset.type = 'button'; reset.className = 'btn'; reset.textContent = 'Reset';
     actions.append(apply, reset); panel.append(grid, actions); section.append(panel);
     const tableSection = table.closest('section.card') || table.parentElement;
@@ -1562,9 +1629,11 @@
       const count = section.querySelector('[data-filter-count]');
       if (count) count.textContent = `${filtered.length} matching ${isTicketRegister ? 'tickets' : 'records'}`;
     };
+    // Apply is an explicit action rather than relying only on native form submission.
+    // This keeps the same behavior across every register module and browser.
+    apply.addEventListener('click', ev => { ev.preventDefault(); ev.stopPropagation(); run(true); });
     panel.addEventListener('submit', ev => { ev.preventDefault(); run(true); });
-    reset.addEventListener('click', () => { grid.querySelectorAll('input,select').forEach(el => el.value = ''); run(true); });
-    grid.querySelectorAll('select').forEach(el => el.addEventListener('change', () => run(true)));
+    reset.addEventListener('click', ev => { ev.preventDefault(); grid.querySelectorAll('input,select').forEach(el => { el.value = ''; }); run(true); });
     const search = grid.querySelector('input[data-filter-key="search"]'); search?.addEventListener('input', () => { clearTimeout(search._filterTimer); search._filterTimer = setTimeout(() => run(true), 180); });
     const foot = table.closest('.card')?.querySelector('.table-foot'); if (foot && !foot.querySelector('[data-filter-count]')) { const count = document.createElement('small'); count.dataset.filterCount = ''; count.style.marginLeft = '12px'; foot.querySelector('span')?.after(count); }
     run(true);
@@ -1721,7 +1790,16 @@
             if (!service) throw new Error('Select a valid Request Type from the Service Catalog.');
           }
         }
-        if (file === 'add-contact.html' && !payload.customer_id) throw new Error('Select the contact’s customer.');
+        if (file === 'add-contact.html') {
+          if (!payload.customer_id) throw new Error('Select the contact’s customer.');
+          if (String(payload.type || '').trim().toLowerCase() === 'primary contact') {
+            const allContacts = Array.isArray(lookupData.allContacts) ? lookupData.allContacts : (lookupData.contacts || []);
+            const current = allContacts.find(row => String(row.contact_id) === String(id || ''));
+            const currentAlreadyPrimaryForCustomer = Boolean(current && String(current.customer_id) === String(payload.customer_id) && String(current.type || '').trim().toLowerCase() === 'primary contact');
+            const duplicate = allContacts.some(row => String(row.customer_id) === String(payload.customer_id) && String(row.contact_id) !== String(id || '') && String(row.type || '').trim().toLowerCase() === 'primary contact');
+            if (duplicate && !currentAlreadyPrimaryForCustomer) throw new Error('This customer already has a Primary Contact. Choose another contact type.');
+          }
+        }
         if (file === 'add-contract.html' && !payload.customer_id) throw new Error('Select a customer for this contract.');
         if ((file === 'add-service.html' || file === 'add-request-type.html') && (payload.request_order === null || payload.request_order === undefined || Number(payload.request_order) < 0 || !Number.isInteger(Number(payload.request_order)))) throw new Error('Sort Order must be zero or a positive whole number.');
         if (file === 'add-team.html' && payload.service_codes?.length) payload.code_id = payload.service_codes[0];
@@ -2690,7 +2768,12 @@
       const count = document.getElementById('audit-count'); if (count) count.textContent = `Showing ${filtered.length ? start + 1 : 0}–${Math.min(start + pageSize, filtered.length)} of ${filtered.length} matching audit records`;
       drawAuditPagination(filtered.length);
     };
+    const auditApplyButton = form?.querySelector('button[type="submit"]');
+    auditApplyButton?.addEventListener('click', ev => { ev.preventDefault(); auditPage = 1; apply(); });
     form?.addEventListener('submit', ev => { ev.preventDefault(); auditPage = 1; apply(); });
+    // Search the already-loaded audit records on every keystroke; other filters
+    // may still be combined with Search and applied through the existing form.
+    search?.addEventListener('input', () => { auditPage = 1; apply(); });
     document.getElementById('audit-clear')?.addEventListener('click', () => { form?.reset(); auditPage = 1; apply(); });
     document.getElementById('audit-export')?.addEventListener('click', () => exportCsv('audit-logs', rows));
     if (!document.body.dataset.auditDetailHandler) {
@@ -2799,6 +2882,10 @@
     });
     installNotificationCenter();
     try { await loadLookups(); } catch (_) { }
+    if (file === 'add-contact.html') {
+      try { lookupData.allContacts = await api('/api/contacts'); }
+      catch (_) { lookupData.allContacts = lookupData.contacts || []; }
+    }
     let cfg = formConfig[file];
     if (file === 'add-customer.html') {
       const isEdit = Boolean(idParam);
@@ -2832,10 +2919,12 @@
       }
       setupDateConstraints();
       setupDependentDropdowns();
+      setupPrimaryContactRule();
       setupUserStatusActions();
       await handleStandardForm(cfg);
     } else {
       setupDependentDropdowns();
+      setupPrimaryContactRule();
     }
     if (file === 'ticket-detail.html') { await handleTicketDetail(); await handleStaffTicketConversation(); }
     if (file === 'user-create-ticket.html') await handleCustomerCreateTicket();

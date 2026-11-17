@@ -18,6 +18,7 @@ import secrets
 import smtplib
 import socket
 import ssl
+import time as _time
 from datetime import date, datetime, time, timedelta, timezone
 from email.message import EmailMessage
 from pathlib import Path
@@ -66,6 +67,18 @@ SESSION_SECRET = os.getenv("SESSION_SECRET", "replace-this-secret-before-deploym
 # after the server is stopped/restarted (for example, Ctrl+C then Uvicorn restart).
 APP_BOOT_ID = secrets.token_urlsafe(24)
 
+# Login policy is enforced by the FastAPI endpoint and persisted in the existing
+# system_settings table, so the limit is shared across app workers and restarts.
+LOGIN_ATTEMPT_WINDOW_SECONDS = 60.0
+LOGIN_MAX_FAILED_ATTEMPTS = 5
+LOGIN_LOCKOUT_SECONDS = 60.0
+
+# The one-time Admin bootstrap credential is written outside BASE_DIR because
+# BASE_DIR is served by StaticFiles. The file is removed after the Admin changes
+# the temporary password.
+INITIAL_ADMIN_PASSWORD_SETTING = "initial_admin_password_bootstrap_completed"
+INITIAL_ADMIN_CREDENTIALS_DIR = BASE_DIR.parent / ".golden_pride_private"
+INITIAL_ADMIN_CREDENTIALS_FILE = INITIAL_ADMIN_CREDENTIALS_DIR / "initial_admin_credentials.txt"
 
 MYANMAR_TIME_ZONE = "Asia/Yangon"
 
@@ -512,6 +525,76 @@ def _client_ip(request: Request | None) -> str | None:
     return str(request.client.host or "")[:64] or None
 
 
+def _login_throttle_storage_key(request: Request) -> str:
+    """Return a non-reversible per-client key for persistent login throttling."""
+    client_ip = _client_ip(request) or "unknown"
+    digest = hashlib.sha256(client_ip.encode("utf-8")).hexdigest()
+    return f"login_attempts:{digest}"
+
+
+def _load_login_throttle_state(db: Session, request: Request) -> tuple[str, dict[str, Any], int]:
+    """Lock and load a client's recent failures; return a Retry-After value when blocked."""
+    key = _login_throttle_storage_key(request)
+    if engine.dialect.name == "postgresql":
+        # Serialize login attempts for the same client across all FastAPI workers.
+        db.execute(text("SELECT pg_advisory_xact_lock(hashtext(:lock_key))"), {"lock_key": key})
+
+    setting = db.get(SystemSetting, key)
+    try:
+        state = json.loads(setting.setting_value or "{}") if setting else {}
+        if not isinstance(state, dict):
+            state = {}
+    except (json.JSONDecodeError, TypeError):
+        state = {}
+
+    now = _time.time()
+    try:
+        locked_until = float(state.get("locked_until") or 0)
+    except (TypeError, ValueError):
+        locked_until = 0.0
+    if locked_until > now:
+        return key, state, max(1, int(locked_until - now + 0.999))
+
+    # Expired lockouts start with a clean one-minute failure window.
+    if locked_until:
+        state = {}
+    recent: list[float] = []
+    for stamp in state.get("failed_at", []) if isinstance(state.get("failed_at", []), list) else []:
+        try:
+            value = float(stamp)
+        except (TypeError, ValueError):
+            continue
+        if 0 <= now - value < LOGIN_ATTEMPT_WINDOW_SECONDS:
+            recent.append(value)
+    state = {"failed_at": recent}
+    return key, state, 0
+
+
+def _save_login_throttle_state(db: Session, key: str, state: dict[str, Any]) -> None:
+    setting = db.get(SystemSetting, key)
+    serialized = json.dumps(state, separators=(",", ":"))
+    if setting is None:
+        db.add(SystemSetting(setting_key=key, setting_value=serialized))
+    else:
+        setting.setting_value = serialized
+
+
+def _record_failed_login(db: Session, key: str, state: dict[str, Any]) -> None:
+    now = _time.time()
+    recent = [float(stamp) for stamp in state.get("failed_at", []) if 0 <= now - float(stamp) < LOGIN_ATTEMPT_WINDOW_SECONDS]
+    recent.append(now)
+    if len(recent) >= LOGIN_MAX_FAILED_ATTEMPTS:
+        _save_login_throttle_state(db, key, {"failed_at": [], "locked_until": now + LOGIN_LOCKOUT_SECONDS})
+    else:
+        _save_login_throttle_state(db, key, {"failed_at": recent})
+
+
+def _clear_login_failures(db: Session, key: str) -> None:
+    setting = db.get(SystemSetting, key)
+    if setting is not None:
+        db.delete(setting)
+
+
 def log_action(db: Session, actor: dict[str, Any] | None, action: str, module: str, details: str = "",
                request: Request | None = None, entity_id: Any = None, entity_label: str | None = None,
                changes: dict[str, Any] | None = None) -> None:
@@ -948,12 +1031,29 @@ def health(db: Session = Depends(get_db)) -> dict[str, str]:
 
 @app.post("/api/auth/login")
 def login(payload: LoginBody, request: Request, db: Session = Depends(get_db)) -> dict[str, Any]:
+    throttle_key, throttle_state, retry_after = _load_login_throttle_state(db, request)
+    if retry_after:
+        raise HTTPException(
+            status_code=429,
+            detail=f"Too many failed login attempts. Please try again in {retry_after} seconds.",
+            headers={"Retry-After": str(retry_after)},
+        )
+
     email = payload.username.strip().lower()
-    user = db.scalar(select(User).where(func.lower(User.email) == email))
+    # The first Admin can sign in with the stable username "admin". This avoids
+    # depending on the demo email address, which may not be a real mailbox.
+    if email == "admin":
+        user = db.scalar(
+            select(User).where(User.role == "admin", User.active.is_(True)).order_by(User.user_id.asc())
+        )
+    else:
+        user = db.scalar(select(User).where(func.lower(User.email) == email))
     if not user or not user.active or not verify_password(payload.password, user.password_hash):
+        _record_failed_login(db, throttle_key, throttle_state)
         log_action(db, None, "LOGIN_FAILED", "Authentication", f"Failed login for {email}", request=request, entity_label=email)
         db.commit()
         raise HTTPException(status_code=401, detail="The email or password is incorrect.")
+    _clear_login_failures(db, throttle_key)
     request.session.clear()
     request.session["user_id"] = user.user_id
     request.session["boot_id"] = APP_BOOT_ID
@@ -1267,6 +1367,13 @@ def change_password(payload: ChangePasswordBody, request: Request, db: Session =
     user.must_change_password = False
     log_action(db, actor, "PASSWORD_CHANGED", "Authentication", "User changed their password", request=request, entity_id=user.user_id, entity_label=user.email, changes={"must_change_password":{"from":before["must_change_password"],"to":False}})
     db.commit()
+    # Once the initial Admin has chosen a private password, remove the only
+    # plaintext copy of the generated temporary credential.
+    if user.role == "admin" and before["must_change_password"]:
+        try:
+            INITIAL_ADMIN_CREDENTIALS_FILE.unlink(missing_ok=True)
+        except OSError:
+            logger.exception("Could not remove the one-time Admin credentials file")
     return {"message": "Password changed successfully. You can now continue to your dashboard."}
 
 
@@ -2936,6 +3043,44 @@ def list_resource(resource: str, request: Request, search: str = Query(default="
     return jsonable_encoder([serialize_row(db, resource, row) for row in rows])
 
 
+def validate_primary_contact(db: Session, data: dict[str, Any], existing: Contact | None = None) -> None:
+    """Allow at most one Contact whose Type is Primary Contact for each Customer."""
+    selected_type = data.get("type", existing.type if existing is not None else None)
+    if str(selected_type or "").strip().casefold() != "primary contact":
+        return
+
+    customer_id = data.get("customer_id", existing.customer_id if existing is not None else None)
+    if customer_id in (None, ""):
+        raise HTTPException(status_code=422, detail="Select a customer before marking this contact as Primary Contact.")
+    customer_id = int(customer_id)
+
+    # PostgreSQL advisory locking serializes concurrent Primary Contact changes
+    # for one customer, so two simultaneous requests cannot both pass the check.
+    if engine.dialect.name == "postgresql":
+        db.execute(
+            text("SELECT pg_advisory_xact_lock(hashtext(:lock_key))"),
+            {"lock_key": f"golden-pride-primary-contact:{customer_id}"},
+        )
+
+    # Editing an existing Primary Contact without changing its customer/type is
+    # not a new assignment, and should remain possible even with legacy duplicates.
+    if existing is not None and existing.customer_id == customer_id and str(existing.type or "").strip().casefold() == "primary contact":
+        return
+
+    duplicate_query = select(Contact.contact_id).where(
+        Contact.customer_id == customer_id,
+        func.lower(func.trim(Contact.type)) == "primary contact",
+    )
+    if existing is not None:
+        duplicate_query = duplicate_query.where(Contact.contact_id != existing.contact_id)
+    duplicate_id = db.scalar(duplicate_query.limit(1))
+    if duplicate_id is not None:
+        raise HTTPException(
+            status_code=409,
+            detail="This customer already has a Primary Contact. Choose another contact type.",
+        )
+
+
 def validate_customer_relationships(db: Session, resource: str, data: dict[str, Any], existing: Any | None = None) -> None:
     """Validate that linked records belong to the selected customer/project scope."""
     def value(key: str) -> Any:
@@ -3399,6 +3544,8 @@ def create_resource(resource: str, payload: dict[str, Any], request: Request, ba
         if actor["role"] != "customer":
             validate_ticket_assignment(db, data)
     validate_customer_relationships(db, resource, data)
+    if resource == "contacts":
+        validate_primary_contact(db, data)
     if resource == "tickets":
         validate_ticket_prerequisites(db, data)
         if actor["role"] == "customer":
@@ -3651,6 +3798,8 @@ def update_resource(resource: str, item_id: str, payload: dict[str, Any], reques
     if resource == "tickets" and actor["role"] != "customer":
         validate_ticket_assignment(db, data, row)
     validate_customer_relationships(db, resource, data, row)
+    if resource == "contacts":
+        validate_primary_contact(db, data, row)
     changed_fields = [key for key, value in data.items() if getattr(row, key, None) != value]
     if resource == "users" and payload.get("password"):
         changed_fields.append("password (updated)")
@@ -4095,7 +4244,7 @@ def seed_database() -> None:
             db.add_all(teams)
             db.flush()
             users = [
-                User(fullname="System Administrator", email="admin@goldenpride.local", password_hash=hash_password(os.getenv("SEED_ADMIN_PASSWORD", "Admin@123")), role="admin"),
+                User(fullname="System Administrator", email="admin@goldenpride.local", password_hash=hash_password(secrets.token_urlsafe(32)), role="admin", must_change_password=True),
                 User(fullname="Support Agent", email="agent@goldenpride.local", password_hash=hash_password(os.getenv("SEED_AGENT_PASSWORD", "Agent@123")), role="agent", team_id=teams[0].team_id),
                 User(fullname="Customer customer", email="customer@goldenpride.local", password_hash=hash_password(os.getenv("SEED_CUSTOMER_PASSWORD", "customer@123")), role="customer"),
             ]
@@ -4148,6 +4297,83 @@ def seed_database() -> None:
         db.add(SystemSetting(setting_key="initial_demo_seed_completed", setting_value="true"))
         db.commit()
     finally:
+        db.close()
+
+
+def ensure_initial_admin_password() -> None:
+    """Create a one-time random Admin password and save it outside the web root.
+
+    Existing installations are handled too: on the first startup after this
+    feature is introduced, the earliest active Admin is assigned a fresh
+    temporary password and forced through the existing change-password flow.
+    Only the password hash is stored in PostgreSQL.
+    """
+    db = SessionLocal()
+    credential_file_written = False
+    temp_file: Path | None = None
+    try:
+        # Serialize initial setup across FastAPI workers on PostgreSQL.
+        if engine.dialect.name == "postgresql":
+            db.execute(
+                text("SELECT pg_advisory_xact_lock(hashtext(:lock_name))"),
+                {"lock_name": INITIAL_ADMIN_PASSWORD_SETTING},
+            )
+
+        if db.get(SystemSetting, INITIAL_ADMIN_PASSWORD_SETTING) is not None:
+            return
+
+        admin = db.scalar(
+            select(User).where(User.role == "admin", User.active.is_(True)).order_by(User.user_id.asc())
+        )
+        if not admin:
+            # Do not mark setup complete until an active Admin exists.
+            return
+
+        temporary_password = secrets.token_urlsafe(24)
+        admin.password_hash = hash_password(temporary_password)
+        admin.must_change_password = True
+
+        INITIAL_ADMIN_CREDENTIALS_DIR.mkdir(parents=True, exist_ok=True)
+        temp_file = INITIAL_ADMIN_CREDENTIALS_DIR / f".initial_admin_credentials.{secrets.token_hex(8)}.tmp"
+        fd = os.open(temp_file, os.O_WRONLY | os.O_CREAT | os.O_EXCL, 0o600)
+        with os.fdopen(fd, "w", encoding="utf-8") as handle:
+            handle.write(
+                "Golden Pride — Initial Admin Login\n"
+                "=====================================\n"
+                "Username: admin\n"
+                f"Temporary password: {temporary_password}\n\n"
+                "Sign in at the Golden Pride login page. You will be required to\n"
+                "change this password immediately. This file is deleted after\n"
+                "the new Admin password is saved. Keep this file private.\n"
+            )
+        try:
+            os.chmod(temp_file, 0o600)
+        except OSError:
+            pass
+        os.replace(temp_file, INITIAL_ADMIN_CREDENTIALS_FILE)
+        temp_file = None
+        credential_file_written = True
+
+        db.add(SystemSetting(setting_key=INITIAL_ADMIN_PASSWORD_SETTING, setting_value="true"))
+        db.commit()
+        logger.warning(
+            "Initial Admin password generated. Read the one-time credentials file at: %s",
+            INITIAL_ADMIN_CREDENTIALS_FILE,
+        )
+    except Exception:
+        db.rollback()
+        if credential_file_written:
+            try:
+                INITIAL_ADMIN_CREDENTIALS_FILE.unlink(missing_ok=True)
+            except OSError:
+                logger.exception("Could not clean up an uncommitted Admin credentials file")
+        raise
+    finally:
+        if temp_file:
+            try:
+                temp_file.unlink(missing_ok=True)
+            except OSError:
+                pass
         db.close()
 
 
@@ -4778,6 +5004,8 @@ async def startup() -> None:
     Base.metadata.create_all(bind=engine)
     migrate_legacy_schema()
     seed_database()
+    # Generate a one-time Admin password on fresh and already-seeded databases.
+    ensure_initial_admin_password()
     # Keep the Support Team catalog available on both fresh and existing databases.
     # This function is idempotent: it adds missing defaults without replacing custom teams.
     ensure_default_support_teams()
