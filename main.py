@@ -1217,6 +1217,37 @@ def dashboard_stats(db: Session = Depends(get_db), actor: dict[str, Any] = Depen
         day_row["total"] = sum(daily_counts[day].values())
         daily_breakdown.append(day_row)
 
+    # Rolling 12-month activity, using the same role-scoped ticket rows.
+    def dashboard_month_start(offset: int) -> date:
+        month_index = today.year * 12 + (today.month - 1) + offset
+        year, zero_based_month = divmod(month_index, 12)
+        return date(year, zero_based_month + 1, 1)
+
+    trend_months = [dashboard_month_start(offset) for offset in range(-11, 1)]
+    monthly_counts = {
+        month: {label: 0 for label in status_labels}
+        for month in trend_months
+    }
+
+    for ticket in tickets:
+        created_local = _as_yangon_datetime(ticket.created_at)
+        if not created_local:
+            continue
+        created_month = created_local.date().replace(day=1)
+        if created_month in monthly_counts:
+            status_label = dashboard_status_label(ticket.status)
+            monthly_counts[created_month][status_label] += 1
+
+    monthly_breakdown = []
+    for month in trend_months:
+        month_row = {
+            "date": month.isoformat(),
+            "label": month.strftime("%b %y"),
+            **monthly_counts[month],
+        }
+        month_row["total"] = sum(monthly_counts[month].values())
+        monthly_breakdown.append(month_row)
+
     agents_overview: list[dict[str, Any]] = []
     customers_overview: list[dict[str, Any]] = []
     if actor["role"] == "admin":
@@ -1279,6 +1310,7 @@ def dashboard_stats(db: Session = Depends(get_db), actor: dict[str, Any] = Depen
         "available_services": available_services,
         "status_breakdown": [{"label": label, "count": status_counts[label]} for label in status_labels],
         "daily_breakdown": daily_breakdown,
+        "monthly_breakdown": monthly_breakdown,
         "agents_overview": agents_overview,
         "customers_overview": customers_overview,
         "module_overview": module_overview,

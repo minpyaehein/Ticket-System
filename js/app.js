@@ -1243,7 +1243,7 @@
     });
     const refreshed = document.querySelector('[data-dashboard-refreshed]');
     if (refreshed) refreshed.textContent = `Live data · Updated ${new Date(stats.refreshed_at || Date.now()).toLocaleTimeString()}`;
-    renderDashboardStatusChart(stats.daily_breakdown || []);
+    renderDashboardStatusChart(stats.monthly_breakdown || []);
     renderDashboardModuleOverview(stats.module_overview || []);
     renderDashboardOverview('[data-dashboard-agent-overview]', stats.agents_overview || [], 'agent');
     renderDashboardOverview('[data-dashboard-customer-overview]', stats.customers_overview || [], 'customer');
@@ -1301,12 +1301,13 @@
     });
   }
 
-  function renderDashboardStatusChart(dailyRows) {
+  function renderDashboardStatusChart(monthlyRows) {
     const target = document.querySelector('[data-dashboard-status-chart]');
     if (!target) return;
     target.replaceChildren();
-    const days = Array.isArray(dailyRows) ? dailyRows : [];
-    const maxTotal = Math.max(1, ...days.map(day => Number(day.total) || 0));
+
+    const months = Array.isArray(monthlyRows) ? monthlyRows : [];
+    const maxTotal = Math.max(1, ...months.map(month => Number(month.total) || 0));
     const series = [
       { key: 'Open', label: 'Open', className: 'open' },
       { key: 'In Progress', label: 'In Progress', className: 'progress' },
@@ -1315,7 +1316,8 @@
       { key: 'Closed', label: 'Closed', className: 'closed' },
       { key: 'Other', label: 'Other', className: 'other' }
     ];
-    if (!days.length) {
+
+    if (!months.length) {
       const empty = document.createElement('p');
       empty.className = 'muted dashboard-empty';
       empty.textContent = 'No ticket data is available yet.';
@@ -1324,19 +1326,23 @@
     }
 
     const chart = document.createElement('div');
-    chart.className = 'dashboard-daily-chart';
-    days.forEach(day => {
+    chart.className = 'dashboard-daily-chart dashboard-monthly-chart';
+
+    months.forEach(month => {
       const column = document.createElement('div');
-      column.className = 'dashboard-day-column';
-      const total = Number(day.total) || 0;
+      column.className = 'dashboard-day-column dashboard-month-column';
+
+      const total = Number(month.total) || 0;
       const value = document.createElement('strong');
       value.className = 'dashboard-day-total';
       value.textContent = String(total);
+
       const stack = document.createElement('div');
       stack.className = 'dashboard-day-stack';
-      stack.setAttribute('aria-label', `${day.date}: ${total} tickets created`);
+      stack.setAttribute('aria-label', `${month.label || month.date}: ${total} tickets created`);
+
       series.forEach(item => {
-        const count = Number(day[item.key]) || 0;
+        const count = Number(month[item.key]) || 0;
         if (!count) return;
         const segment = document.createElement('div');
         segment.className = `dashboard-day-segment status-${item.className}`;
@@ -1344,10 +1350,11 @@
         segment.title = `${item.label}: ${count}`;
         stack.appendChild(segment);
       });
+
       const label = document.createElement('span');
       label.className = 'dashboard-day-label';
-      label.textContent = String(day.label || day.date || '—');
-      label.title = String(day.date || '');
+      label.textContent = String(month.label || month.date || '—');
+      label.title = String(month.date || '');
       column.append(value, stack, label);
       chart.appendChild(column);
     });
@@ -1356,7 +1363,7 @@
     const legend = document.createElement('div');
     legend.className = 'dashboard-chart-legend';
     series.forEach(item => {
-      const count = days.reduce((sum, day) => sum + (Number(day[item.key]) || 0), 0);
+      const count = months.reduce((sum, month) => sum + (Number(month[item.key]) || 0), 0);
       if (item.key === 'Other' && count === 0) return;
       const entry = document.createElement('span');
       entry.className = `dashboard-legend-item status-${item.className}`;
@@ -1368,12 +1375,14 @@
       legend.appendChild(entry);
     });
     target.appendChild(legend);
-    const recentTotal = days.reduce((sum, day) => sum + (Number(day.total) || 0), 0);
+
+    const totalTickets = months.reduce((sum, month) => sum + (Number(month.total) || 0), 0);
     const summary = document.createElement('div');
     summary.className = 'dashboard-chart-summary';
-    summary.textContent = `${recentTotal.toLocaleString()} tickets created in the last 7 days · Live database data`;
+    summary.textContent = `${totalTickets.toLocaleString()} tickets created in the last 12 months · Live database data`;
     target.appendChild(summary);
   }
+
   function renderDashboardOverview(selector, rows, kind) {
     const target = document.querySelector(selector);
     if (!target) return;

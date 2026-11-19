@@ -3189,3 +3189,18 @@ select[multiple].select {
         padding: 7px 9px;
     }
 }
+
+/* Monthly dashboard chart: 12 compact month columns with horizontal overflow on small screens. */
+.dashboard-monthly-chart {
+    gap: 8px;
+    justify-content: space-between;
+}
+
+.dashboard-month-column {
+    min-width: 42px;
+    max-width: 84px;
+}
+
+.dashboard-month-column .dashboard-day-stack {
+    width: min(34px, 75%);
+}
