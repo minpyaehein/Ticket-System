@@ -2272,10 +2272,24 @@
       const subject = document.getElementById('template-subject'); const body = document.getElementById('template-body');
       if (subject) subject.value = tpl.subject || ''; if (body) body.value = tpl.body || '';
     }
+    // Apply the authenticated role before revealing any part of this shared page.
+    // The initial HTML also carries hidden attributes, so Admin controls cannot flash
+    // while /api/auth/me is being checked during a refresh.
+    adminSections.forEach(section => {
+      section.hidden = !isAdmin;
+      section.classList.toggle('hidden', !isAdmin);
+    });
+    if (metrics) {
+      metrics.hidden = !isAdmin;
+      metrics.classList.toggle('hidden', !isAdmin);
+    }
+    const personal = document.getElementById('personal-preferences');
+    if (personal) {
+      personal.hidden = isAdmin;
+      personal.classList.toggle('hidden', isAdmin);
+    }
+
     if (!isAdmin) {
-      adminSections.forEach(el => el.classList.add('hidden'));
-      if (metrics) metrics.classList.add('hidden');
-      const personal = document.getElementById('personal-preferences'); if (personal) personal.style.display = 'block';
       if (notice) notice.textContent = 'Your own email preferences are shown below. Admin manages SMTP settings and global event rules. Your in-app notifications still appear in the notification bell.';
       try {
         const result = await api('/api/notification-preferences');
@@ -2930,7 +2944,10 @@
     if (file === 'user-create-ticket.html') await handleCustomerCreateTicket();
     if (file === 'user-ticket-detail.html') await handleTicketConversation();
     if (file === 'asset-detail.html' || file === 'customer-detail.html') await handleEditDetails();
-    if (file === 'email-notifications.html') await handleEmailPage();
+    if (file === 'email-notifications.html') {
+      try { await handleEmailPage(); }
+      finally { document.documentElement.classList.remove('gp-email-role-pending'); }
+    }
     if (file === 'change-password.html') await handleChangePassword();
     if (file === 'add-role.html') await handleRoleForm();
     if (pageResource[file]) await loadList(pageResource[file]);

@@ -4,9 +4,37 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
+  <script>
+    // Keep this shared page covered until app.js confirms the signed-in role.
+    if ((location.pathname.split('/').pop() || '').toLowerCase() === 'email-notifications.html') {
+      document.documentElement.classList.add('gp-email-role-pending');
+    }
+  </script>
   <title>Email Notification Service | Golden Pride</title>
   <link rel="stylesheet" href="css/style.css">
   <style>
+    /* Do not expose the static Admin layout while the authenticated role is loading. */
+    html.gp-email-role-pending body>.app {
+      visibility: hidden;
+    }
+
+    html.gp-email-role-pending body::before {
+      content: "Loading your workspace…";
+      position: fixed;
+      inset: 0;
+      z-index: 99999;
+      display: grid;
+      place-items: center;
+      background: #f7f8fb;
+      color: #394253;
+      font: 600 14px/1.4 Arial, sans-serif;
+      visibility: visible;
+    }
+
+    [hidden] {
+      display: none !important;
+    }
+
     .email-page {
       max-width: 1500px;
       margin: 0 auto
@@ -403,14 +431,14 @@
         <div class="top-actions"><a class="btn btn-primary" href="tickets.html">Ticket Workspace</a></div>
       </header>
 
-      <div class="metric-grid" id="email-metrics">
+      <div class="metric-grid" id="email-metrics" hidden>
         <div class="metric"><small>Queued</small><strong id="metric-queued">0</strong></div>
         <div class="metric"><small>Retry / Failed</small><strong id="metric-retry">0</strong></div>
         <div class="metric"><small>Sent · Today</small><strong id="metric-sent">0</strong></div>
         <div class="metric"><small>Failed · Today</small><strong id="metric-failed">0</strong></div>
       </div>
 
-      <section class="section-card admin-only" id="smtp-section">
+      <section class="section-card admin-only" hidden id="smtp-section">
         <div class="section-head">
           <div>
             <h2><span class="step">1</span>SMTP Settings</h2>
@@ -477,7 +505,7 @@
         </div>
       </section>
 
-      <div class="panel-grid admin-only" id="test-and-rules">
+      <div class="panel-grid admin-only" hidden id="test-and-rules">
         <section class="section-card">
           <div class="section-head">
             <div>
@@ -506,7 +534,7 @@
         </section>
       </div>
 
-      <section class="section-card admin-only" id="automation-timing-section">
+      <section class="section-card admin-only" hidden id="automation-timing-section">
         <div class="section-head">
           <div>
             <h2>Automation Timing</h2>
@@ -557,7 +585,7 @@
         </div>
       </section>
 
-      <section class="section-card admin-only" id="templates-section">
+      <section class="section-card admin-only" hidden id="templates-section">
         <div class="section-head">
           <div>
             <h2><span class="step">4</span>Email Templates</h2>
@@ -585,7 +613,7 @@
         </div>
       </section>
 
-      <section class="section-card admin-only" id="delivery-section">
+      <section class="section-card admin-only" hidden id="delivery-section">
         <div class="section-head">
           <div>
             <h2><span class="step">5</span>Email Delivery Log</h2>
@@ -626,7 +654,7 @@
         </div>
       </section>
 
-      <section class="section-card" id="personal-preferences" style="display:none">
+      <section class="section-card" id="personal-preferences" hidden>
         <div class="section-head">
           <div>
             <h2>My Email Preferences</h2>
