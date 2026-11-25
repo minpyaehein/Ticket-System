@@ -349,7 +349,33 @@
     const head = document.createElement('div'); head.className = 'gp-notification-head'; head.innerHTML = '<span>Notifications</span><button type="button" id="gp-notification-read-all">Mark all read</button>';
     const list = document.createElement('div'); list.id = 'gp-notification-list'; panel.append(head, list); wrap.append(bell, panel);
     topActions.prepend(wrap);
-    bell.addEventListener('click', () => { panel.classList.toggle('open'); if (panel.classList.contains('open')) loadNotifications(); });
+    function positionNotificationPanel() {
+      if (!panel.classList.contains('open')) return;
+      if (window.innerWidth <= 640) {
+        const rect = bell.getBoundingClientRect();
+        const width = Math.max(0, Math.min(390, window.innerWidth - 24));
+        const left = Math.max(12, Math.min(rect.left, window.innerWidth - width - 12));
+        const top = rect.bottom + 9;
+        panel.style.position = 'fixed';
+        panel.style.left = `${left}px`;
+        panel.style.right = 'auto';
+        panel.style.top = `${top}px`;
+        panel.style.width = `${width}px`;
+        panel.style.maxWidth = `${width}px`;
+        panel.style.maxHeight = `${Math.max(120, Math.min(470, window.innerHeight - top - 12))}px`;
+        panel.style.boxSizing = 'border-box';
+      } else {
+        panel.removeAttribute('style');
+      }
+    }
+    bell.addEventListener('click', () => {
+      panel.classList.toggle('open');
+      if (panel.classList.contains('open')) {
+        positionNotificationPanel();
+        loadNotifications();
+      }
+    });
+    window.addEventListener('resize', positionNotificationPanel);
     document.addEventListener('click', ev => { if (!wrap.contains(ev.target)) panel.classList.remove('open'); });
     document.getElementById('gp-notification-read-all')?.addEventListener('click', async () => { try { await api('/api/notifications/read-all', { method: 'POST' }); await loadNotifications(); } catch (e) { toast(e.message, 'error'); } });
     async function loadNotifications() {
