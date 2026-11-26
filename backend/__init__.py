@@ -1,0 +1,1 @@
+"""Golden Pride backend package."""
